@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6ed357fc-926c-42f1-8b3f-8b7fa3860d4d" name="Changes" comment=" ya se puede desplegar el servidor de manera local" />
+    <list default="true" id="6ed357fc-926c-42f1-8b3f-8b7fa3860d4d" name="Changes" comment="listo">
+      <change afterPath="$PROJECT_DIR$/inventory/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InventoryPro/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/InventoryPro/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -103,11 +108,20 @@
       <option name="project" value="LOCAL" />
       <updated>1774990518473</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="listo">
+      <option name="closed" value="true" />
+      <created>1775600943851</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1775600943851</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value=" ya se puede desplegar el servidor de manera local" />
-    <option name="LAST_COMMIT_MESSAGE" value=" ya se puede desplegar el servidor de manera local" />
+    <MESSAGE value="listo" />
+    <option name="LAST_COMMIT_MESSAGE" value="listo" />
   </component>
 </project>
