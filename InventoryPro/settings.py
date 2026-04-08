@@ -1,18 +1,22 @@
-from pathlib import Path
 import os
+from pathlib import Path
+from dotenv import load_dotenv  # Asegúrate de tener esta línea
+
+# --- CARGAR VARIABLES DE ENTORNO ---
+load_dotenv()  # Esto lee el archivo .env que creaste
 
 # --- BASE DIRECTORY ---
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# --- SEGURIDAD (Obligatorio) ---
-# En desarrollo puedes dejar esta, pero en producción usa variables de entorno
-SECRET_KEY = "django-insecure-tu-clave-aqui"
+# --- SEGURIDAD ---
+# Ahora usamos os.getenv para jalar los datos del .env
+SECRET_KEY = os.getenv("SECRET_KEY")
 
-# CAMBIO AQUÍ: Ponlo en True para desarrollar localmente y ver errores
-DEBUG = True
+# DEBUG ahora es dinámico (se vuelve False automáticamente si en el .env pones False)
+DEBUG = os.getenv("DEBUG", "True") == "True"
 
-# Al estar en DEBUG = True, esto puede estar vacío, pero mejor dejarlo configurado
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+# ALLOWED_HOSTS se convierte en lista automáticamente
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 # --- APPS ---
 INSTALLED_APPS = [
