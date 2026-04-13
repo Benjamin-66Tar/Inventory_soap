@@ -27,8 +27,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "corsheaders",
+    "inventory.apps.InventoryConfig",
     "rest_framework",
-    "inventory",
 ]
 
 # --- MIDDLEWARE (Obligatorio para que funcione el servidor) ---
@@ -84,4 +84,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:3001",  # Agrega esta línea
+    "http://127.0.0.1:3001",  # También esta por seguridad
 ]

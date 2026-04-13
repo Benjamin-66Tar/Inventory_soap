@@ -32,3 +32,11 @@ class Jabon(models.Model):
     def __str__(self):
         # Ahora el __str__ mostrará el nombre legible (ej: "Jabón de Avena (Cuidado Personal y Piel)")
         return f"{self.categoria} ({self.get_categoria_display()})"
+
+class ConsumoInsumo(models.Model):
+    insumo = models.ForeignKey(Insumos, on_delete=models.CASCADE, related_name='consumos')
+    cantidad_usada = models.FloatField()
+    fecha_uso = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Consumo de {self.cantidad_usada}g de {self.insumo.nombre}"

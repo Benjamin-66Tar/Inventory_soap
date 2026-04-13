@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Insumos, Jabon
+from .models import Insumos, Jabon, ConsumoInsumo
 
 # Personalización del encabezado del panel (Opcional pero recomendado)
 admin.site.site_header = "Administración de Inventario Benys"
@@ -30,3 +30,9 @@ class JabonAdmin(admin.ModelAdmin):
 
     # Esto permite editar la cantidad directamente desde la lista sin entrar al detalle
     list_editable = ('cantidad',)
+
+@admin.register(ConsumoInsumo)
+class ConsumoAdmin(admin.ModelAdmin):
+    list_display = ('insumo', 'cantidad_usada', 'fecha_uso')
+    list_filter = ('fecha_uso', 'insumo')
+    search_fields = ('insumo__nombre',)

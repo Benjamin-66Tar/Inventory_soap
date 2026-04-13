@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Insumos, Jabon
+from .models import Insumos, Jabon, ConsumoInsumo
 
 class InsumoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,3 +18,8 @@ class JabonSerializer(serializers.ModelSerializer):
         model = Jabon
 
         fields = ['id', 'nombre', 'cantidad', 'categoria', 'fecha_elaboracion', 'peso_gramos']
+
+class ConsumoInsumoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ConsumoInsumo
+        fields = '__all__'
