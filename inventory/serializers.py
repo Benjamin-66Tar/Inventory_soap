@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Insumos, Jabon, ConsumoInsumo
+from .models import Insumos, Jabon, ConsumoInsumo, SalidaJabon
 
 class InsumoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,3 +23,11 @@ class ConsumoInsumoSerializer(serializers.ModelSerializer):
     class Meta:
         model = ConsumoInsumo
         fields = '__all__'
+
+class SalidaJabonSerializer(serializers.ModelSerializer):
+    # Esto permite ver el nombre del motivo en lugar del código (ej: 'Venta' en lugar de 'VENTA')
+    motivo_display = serializers.CharField(source='get_motivo_salida_display', read_only=True)
+
+    class Meta:
+        model = SalidaJabon
+        fields = ['id', 'jabon', 'cantidad_salida', 'motivo_salida', 'motivo_display', 'fecha_salida']

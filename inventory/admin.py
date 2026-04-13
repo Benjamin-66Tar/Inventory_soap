@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Insumos, Jabon, ConsumoInsumo
+from .models import Insumos, Jabon, ConsumoInsumo, SalidaJabon
 
 # Personalización del encabezado del panel (Opcional pero recomendado)
 admin.site.site_header = "Administración de Inventario Benys"
@@ -36,3 +36,18 @@ class ConsumoAdmin(admin.ModelAdmin):
     list_display = ('insumo', 'cantidad_usada', 'fecha_uso')
     list_filter = ('fecha_uso', 'insumo')
     search_fields = ('insumo__nombre',)
+
+
+@admin.register(SalidaJabon)
+class SalidaJabonAdmin(admin.ModelAdmin):
+    # Columnas principales para rastrear las salidas de stock
+    list_display = ('jabon', 'cantidad_salida', 'motivo_salida', 'fecha_salida')
+
+    # Filtros para que puedas ver rápidamente cuántos fueron 'Venta' o 'Merma'
+    list_filter = ('motivo_salida', 'fecha_salida', 'jabon')
+
+    # Buscador para localizar movimientos de un jabón específico
+    search_fields = ('jabon__nombre', 'motivo_salida')
+
+    # Ordenar por lo más reciente primero
+    ordering = ('-fecha_salida',)

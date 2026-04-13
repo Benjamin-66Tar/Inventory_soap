@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from .models import Insumos, Jabon, ConsumoInsumo
-from .serializers import InsumoSerializer, JabonSerializer, ConsumoInsumoSerializer
+from .models import Insumos, Jabon, ConsumoInsumo, SalidaJabon
+from .serializers import InsumoSerializer, JabonSerializer, ConsumoInsumoSerializer, SalidaJabonSerializer
 
 class InsumoViewSet(viewsets.ModelViewSet):
     queryset = Insumos.objects.all()
@@ -13,3 +13,7 @@ class JabonViewSet(viewsets.ModelViewSet):
 class ConsumoInsumoViewSet(viewsets.ModelViewSet):
     queryset = ConsumoInsumo.objects.all()
     serializer_class = ConsumoInsumoSerializer
+
+class SalidaJabonViewSet(viewsets.ModelViewSet):
+    queryset = SalidaJabon.objects.all()
+    serializer_class = SalidaJabonSerializer
