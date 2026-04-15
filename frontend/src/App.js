@@ -1,14 +1,30 @@
 import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Inventario from './Inventario'; // Importamos tu nuevo componente
+import Layout from './components/Layout';
+
+
 
 function App() {
   return (
-    <div className="App">
-      {/* Ya no necesitamos useState ni useEffect aquí,
-          porque Inventario.js ya se encarga de eso.
-      */}
-      <Inventario />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* Ruta principal que contiene el Sidebar y el Outlet */}
+        <Route path="/" element={<Layout />}>
+
+          {/* Redirección automática al inventario al entrar a la app */}
+          <Route index element={<Navigate to="/inventario-jabones" replace />} />
+
+          {/* Secciones de navegación */}
+          <Route path="inventario-jabones" element={<Inventario />} />
+
+          {/* Aquí conectarás tu componente de Materias Primas cuando lo tengas */}
+          <Route path="materias-primas" element={<div>Sección de Materias Primas</div>} />
+
+          {/* Escala aquí: nuevas rutas como 'ventas' o 'reportes' */}
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
