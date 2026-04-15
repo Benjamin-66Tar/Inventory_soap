@@ -13,13 +13,10 @@ function App() {
         <Route path="/" element={<Layout />}>
 
           {/* Redirección automática al inventario al entrar a la app */}
-          <Route index element={<Navigate to="/inventario-jabones" replace />} />
+          <Route index element={<Navigate to="/inventario" replace />} />
 
           {/* Secciones de navegación */}
-          <Route path="inventario-jabones" element={<Inventario />} />
-
-          {/* Aquí conectarás tu componente de Materias Primas cuando lo tengas */}
-          <Route path="materias-primas" element={<div>Sección de Materias Primas</div>} />
+          <Route path="inventario" element={<Inventario />} />
 
           {/* Escala aquí: nuevas rutas como 'ventas' o 'reportes' */}
         </Route>
