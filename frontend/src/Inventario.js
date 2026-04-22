@@ -2,11 +2,21 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import TablaInsumos from './components/TablaInsumos';
 import TablaJabones from './components/TablaJabones';
+import FormularioJabon from './components/FormularioJabon';
 
 const Inventario = () => {
     const [view, setView] = useState('jabones'); // 'jabones' o 'insumos'
     const [insumos, setInsumos] = useState([]);
     const [jabones, setJabones] = useState([]);
+
+    const [showModal, setShowModal] = useState(false);
+
+    const agregarNuevoJabon = (nuevoJabon) => {
+    setJabones([...jabones, nuevoJabon]);
+    };
+
+    // En el return, podrías mostrar el modal:
+    {showModal && <FormularioJabon onJabonAgregado={agregarNuevoJabon} alCerrar={() => setShowModal(false)} />}
 
     useEffect(() => {
         // Carga centralizada de datos para mantener la sincronización
@@ -34,12 +44,24 @@ const Inventario = () => {
                 </button>
             </div>
 
-            {/* Renderizado Condicional */}
+            <div style={{ marginTop: '20px' }}>
             {view === 'jabones' ? (
-                <TablaJabones datos={jabones} />
+                <TablaJabones
+                    datos={jabones}
+                    onAbrirFormulario={() => setShowModal(true)}
+                />
             ) : (
                 <TablaInsumos datos={insumos} />
             )}
+            </div>
+
+            {showModal && (
+                <FormularioJabon
+                    onJabonAgregado={agregarNuevoJabon}
+                    alCerrar={() => setShowModal(false)}
+                />
+            )}
+
         </div>
     );
 };

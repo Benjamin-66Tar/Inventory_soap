@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 
-const TablaJabones = ({ datos = [] }) => {
+const TablaJabones = ({ datos = [], onAbrirFormulario }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('');
     const UMBRAL_CRITICO = 5;
@@ -20,7 +20,7 @@ const TablaJabones = ({ datos = [] }) => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h2>Productos Terminados</h2>
                 <button
-                    onClick={() => alert("Aquí abrirías el Modal de Registro de Jabón")}
+                    onClick={onAbrirFormulario}
                     style={{ backgroundColor: '#007bff', color: 'white', padding: '10px', borderRadius: '5px' }}
                 >
                     + Nuevo Jabón
