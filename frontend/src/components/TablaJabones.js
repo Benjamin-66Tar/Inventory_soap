@@ -16,7 +16,16 @@ const TablaJabones = ({ datos = [] }) => {
 
     return (
         <section>
-            <h2>Productos Terminados (Jabones)</h2>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h2>Productos Terminados</h2>
+                <button
+                    onClick={() => alert("Aquí abrirías el Modal de Registro de Jabón")}
+                    style={{ backgroundColor: '#007bff', color: 'white', padding: '10px', borderRadius: '5px' }}
+                >
+                    + Nuevo Jabón
+                </button>
+            </div>
 
             {/* Controles de búsqueda y filtrado */}
             <div style={{ marginBottom: '15px', display: 'flex', gap: '10px' }}>
