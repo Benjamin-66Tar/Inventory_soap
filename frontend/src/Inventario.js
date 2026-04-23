@@ -3,18 +3,25 @@ import axios from 'axios';
 import TablaInsumos from './components/TablaInsumos';
 import TablaJabones from './components/TablaJabones';
 import FormularioJabon from './components/FormularioJabon';
+import FormularioInsumo from './components/FormularioInsumo';
 
 const Inventario = () => {
     const [view, setView] = useState('jabones'); // 'jabones' o 'insumos'
     const [insumos, setInsumos] = useState([]);
     const [jabones, setJabones] = useState([]);
 
+    // Estados para controlar la visibilidad de los modales
     const [showModal, setShowModal] = useState(false);
+    const [showModalInsumo, setShowModalInsumo] = useState(false);
 
+    // Funciones para actualizar el estado local tras agregar un registro
     const agregarNuevoJabon = (nuevoJabon) => {
-    setJabones([...jabones, nuevoJabon]);
+        setJabones([...jabones, nuevoJabon]);
     };
 
+    const agregarNuevoInsumo = (nuevoInsumo) => {
+        setInsumos([...insumos, nuevoInsumo]);
+    };
     // En el return, podrías mostrar el modal:
     {showModal && <FormularioJabon onJabonAgregado={agregarNuevoJabon} alCerrar={() => setShowModal(false)} />}
 
@@ -44,6 +51,7 @@ const Inventario = () => {
                 </button>
             </div>
 
+            {/* Renderizado Condicional de Tablas */}
             <div style={{ marginTop: '20px' }}>
             {view === 'jabones' ? (
                 <TablaJabones
@@ -51,7 +59,10 @@ const Inventario = () => {
                     onAbrirFormulario={() => setShowModal(true)}
                 />
             ) : (
-                <TablaInsumos datos={insumos} />
+                <TablaInsumos datos={insumos}
+                    datos={insumos}
+                    onAbrirFormulario={() => setShowModalInsumo(true)}
+                />
             )}
             </div>
 
@@ -59,6 +70,14 @@ const Inventario = () => {
                 <FormularioJabon
                     onJabonAgregado={agregarNuevoJabon}
                     alCerrar={() => setShowModal(false)}
+                />
+            )}
+
+            {/* CORRECCIÓN 2: Renderizar el formulario de insumos cuando el estado sea true */}
+            {showModalInsumo && (
+                <FormularioInsumo
+                    onInsumoAgregado={agregarNuevoInsumo}
+                    alCerrar={() => setShowModalInsumo(false)}
                 />
             )}
 
