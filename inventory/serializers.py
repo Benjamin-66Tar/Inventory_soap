@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Insumos, Jabon, ConsumoInsumo, SalidaJabon
+from .models import Insumos, Jabon, ConsumoInsumo, SalidaJabon, DetalleProduccionInsumo, Produccion
 
 class InsumoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,3 +31,35 @@ class SalidaJabonSerializer(serializers.ModelSerializer):
     class Meta:
         model = SalidaJabon
         fields = ['id', 'jabon', 'cantidad_salida', 'motivo_salida', 'motivo_display', 'fecha_salida']
+
+
+class DetalleProduccionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DetalleProduccionInsumo
+        fields = ['insumo', 'lote_origen', 'cantidad_utilizada', 'costo_unitario_momento']
+
+
+class ProduccionSerializer(serializers.ModelSerializer):
+    detalles_insumos = DetalleProduccionSerializer(many=True)
+
+    class Meta:
+        model = Produccion
+        fields = '__all__'
+
+    def create(self, validated_data):
+        detalles_data = validated_data.pop('detalles_insumos')
+        produccion = Produccion.objects.create(**validated_data)
+
+        total_costo = 0
+        for detalle in detalles_data:
+            # Aquí restas el stock del modelo Insumo/Lote
+            insumo = detalle['insumo']
+            insumo.stock -= detalle['cantidad_utilizada']
+            insumo.save()
+
+            total_costo += (detalle['cantidad_utilizada'] * detalle['costo_unitario_momento'])
+            DetalleProduccionInsumo.objects.create(produccion=produccion, **detalle)
+
+        produccion.costo_total = total_costo
+        produccion.save()
+        return produccion

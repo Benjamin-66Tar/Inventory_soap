@@ -59,3 +59,38 @@ class SalidaJabon(models.Model):
 
     def __str__(self):
         return f"{self.jabon.nombre} - {self.get_motivo_salida_display()}"
+
+
+# inventory/models.py
+
+class Receta(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField(blank=True)
+
+    # Relación con insumos base para precargar (opcional)
+
+    def __str__(self):
+        return self.nombre
+
+
+class Produccion(models.Model):
+    TIPO_PRODUCCION = [
+        ('ESTANDAR', 'Receta Estándar'),
+        ('EXPERIMENTO', 'Experimento/Nuevo'),
+    ]
+    tipo = models.CharField(max_length=20, choices=TIPO_PRODUCCION)
+    receta = models.ForeignKey(Receta, on_delete=models.SET_NULL, null=True, blank=True)
+    fecha_elaboracion = models.DateTimeField(auto_now_add=True)
+    unidades_resultantes = models.IntegerField(default=0)
+    temperatura_mezcla = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    notas = models.TextField(blank=True)
+    costo_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+
+class DetalleProduccionInsumo(models.Model):
+    """Corazón de la trazabilidad: relaciona la producción con lotes específicos de insumos"""
+    produccion = models.ForeignKey(Produccion, related_name='detalles_insumos', on_delete=CASCADE)
+    insumo = models.ForeignKey('Insumo', on_delete=models.CASCADE)
+    lote_origen = models.CharField(max_length=50, help_text="ID del lote de materia prima")
+    cantidad_utilizada = models.DecimalField(max_digits=10, decimal_places=2)
+    costo_unitario_momento = models.DecimalField(max_digits=10, decimal_places=2)
