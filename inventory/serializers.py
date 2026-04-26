@@ -50,16 +50,12 @@ class ProduccionSerializer(serializers.ModelSerializer):
         detalles_data = validated_data.pop('detalles_insumos')
         produccion = Produccion.objects.create(**validated_data)
 
-        total_costo = 0
         for detalle in detalles_data:
-            # Aquí restas el stock del modelo Insumo/Lote
             insumo = detalle['insumo']
-            insumo.stock -= detalle['cantidad_utilizada']
+            # CORRECCIÓN: Usar 'cantidad_gramos' en lugar de 'stock'
+            insumo.cantidad_gramos -= detalle['cantidad_utilizada']
             insumo.save()
 
-            total_costo += (detalle['cantidad_utilizada'] * detalle['costo_unitario_momento'])
             DetalleProduccionInsumo.objects.create(produccion=produccion, **detalle)
 
-        produccion.costo_total = total_costo
-        produccion.save()
         return produccion

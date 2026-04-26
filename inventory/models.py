@@ -89,8 +89,8 @@ class Produccion(models.Model):
 
 class DetalleProduccionInsumo(models.Model):
     """Corazón de la trazabilidad: relaciona la producción con lotes específicos de insumos"""
-    produccion = models.ForeignKey(Produccion, related_name='detalles_insumos', on_delete=CASCADE)
-    insumo = models.ForeignKey('Insumo', on_delete=models.CASCADE)
+    produccion = models.ForeignKey(Produccion, related_name='detalles_insumos', on_delete=models.CASCADE)
+    insumo = models.ForeignKey('Insumos', on_delete=models.CASCADE)
     lote_origen = models.CharField(max_length=50, help_text="ID del lote de materia prima")
     cantidad_utilizada = models.DecimalField(max_digits=10, decimal_places=2)
     costo_unitario_momento = models.DecimalField(max_digits=10, decimal_places=2)
