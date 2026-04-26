@@ -1,9 +1,10 @@
 from django.db import models
+from django.core.validators import MinValueValidator
 
 class Insumos(models.Model):
     #Son detalle de los ingredientes del jabón
     nombre = models.CharField(max_length=100)
-    cantidad_gramos = models.FloatField()
+    cantidad_gramos = models.FloatField(validators=[MinValueValidator(0.0)])
     proveedor = models.CharField(max_length=100)
     fecha_ingreso = models.DateField()
 
@@ -80,6 +81,13 @@ class Produccion(models.Model):
     ]
     tipo = models.CharField(max_length=20, choices=TIPO_PRODUCCION)
     receta = models.ForeignKey(Receta, on_delete=models.SET_NULL, null=True, blank=True)
+    jabon_producido = models.ForeignKey(
+        Jabon,
+        on_delete=models.CASCADE,
+        related_name='producciones',
+        null=True,
+        blank=True
+    )
     fecha_elaboracion = models.DateTimeField(auto_now_add=True)
     unidades_resultantes = models.IntegerField(default=0)
     temperatura_mezcla = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)

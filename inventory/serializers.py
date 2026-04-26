@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Insumos, Jabon, ConsumoInsumo, SalidaJabon, DetalleProduccionInsumo, Produccion
+from django.db import transaction
 
 class InsumoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,6 +38,9 @@ class DetalleProduccionSerializer(serializers.ModelSerializer):
     class Meta:
         model = DetalleProduccionInsumo
         fields = ['insumo', 'lote_origen', 'cantidad_utilizada', 'costo_unitario_momento']
+        extra_kwargs = {
+            'costo_unitario_momento': {'required': False, 'allow_null': True}
+        }
 
 
 class ProduccionSerializer(serializers.ModelSerializer):
@@ -48,14 +52,43 @@ class ProduccionSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         detalles_data = validated_data.pop('detalles_insumos')
-        produccion = Produccion.objects.create(**validated_data)
 
-        for detalle in detalles_data:
-            insumo = detalle['insumo']
-            # CORRECCIÓN: Usar 'cantidad_gramos' en lugar de 'stock'
-            insumo.cantidad_gramos -= detalle['cantidad_utilizada']
-            insumo.save()
+        with transaction.atomic():
+            # 1. VALIDAR STOCK PRIMERO (Antes de crear nada)
+            for detalle in detalles_data:
+                insumo = detalle['insumo']
+                cantidad = detalle['cantidad_utilizada']
+                if insumo.cantidad_gramos < cantidad:
+                    raise serializers.ValidationError(
+                        f"Stock insuficiente para {insumo.nombre}. Disponible: {insumo.cantidad_gramos}g"
+                    )
 
-            DetalleProduccionInsumo.objects.create(produccion=produccion, **detalle)
+            # 2. CREAR LA PRODUCCIÓN (Una sola vez)
+            produccion = Produccion.objects.create(**validated_data)
 
-        return produccion
+            # 3. AUMENTO DE STOCK DEL JABÓN
+            if produccion.jabon_producido and produccion.unidades_resultantes > 0:
+                jabon = produccion.jabon_producido
+                jabon.cantidad += produccion.unidades_resultantes
+                jabon.save()
+
+            # 4. CREAR DETALLES Y DESCONTAR STOCK DE INSUMOS
+            for detalle in detalles_data:
+                insumo = detalle['insumo']
+                cantidad = detalle['cantidad_utilizada']
+                # Nota: Asegúrate que 'precio_unitario' exista en tu modelo Insumos
+                costo = detalle.get('costo_unitario_momento') or getattr(insumo, 'precio_unitario', 0)
+
+                DetalleProduccionInsumo.objects.create(
+                    produccion=produccion,
+                    insumo=insumo,
+                    cantidad_utilizada=cantidad,
+                    lote_origen=detalle['lote_origen'],
+                    costo_unitario_momento=costo
+                )
+
+                # Descuento real
+                insumo.cantidad_gramos -= float(cantidad)
+                insumo.save()
+
+            return produccion

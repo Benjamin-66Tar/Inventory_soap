@@ -3,6 +3,8 @@ import axios from 'axios';
 
 const Produccion = () => {
     const [insumosDisponibles, setInsumosDisponibles] = useState([]);
+    const [jabones, setJabones] = useState([]);
+    const [jabonSeleccionado, setJabonSeleccionado] = useState('');
     const [tipo, setTipo] = useState('ESTANDAR');
     const [unidades, setUnidades] = useState(0);
     const [notas, setNotas] = useState('');
@@ -10,15 +12,21 @@ const Produccion = () => {
         { insumoId: '', cantidadReal: '', lote: '' }
     ]);
 
-    // CARGA DE DATOS - Verificado para Django
+    // Carga de insumos disponibles desde el backend
     useEffect(() => {
         axios.get('http://127.0.0.1:8000/api/insumos/')
             .then(res => {
-                // Django puede enviar [ ] o { "results": [ ] }
                 const data = Array.isArray(res.data) ? res.data : (res.data.results || []);
                 setInsumosDisponibles(data);
             })
             .catch(err => console.error("Error al cargar insumos:", err));
+
+        axios.get('http://127.0.0.1:8000/api/jabones/')
+            .then(res => {
+                const data = Array.isArray(res.data) ? res.data : (res.data.results || []);
+                setJabones(data);
+            })
+            .catch(err => console.error("Error al cargar jabones:", err));
     }, []);
 
     const agregarFila = () => {
@@ -31,50 +39,91 @@ const Produccion = () => {
         setFilasInsumos(nuevasFilas);
     };
 
-    const guardarProduccion = async (e) => {
+    const eliminarFila = (index) => {
+        if (filasInsumos.length > 1) {
+            const nuevasFilas = filasInsumos.filter((_, i) => i !== index);
+            setFilasInsumos(nuevasFilas);
+        }
+    };
+
+    const manejarEnvio = async (e) => {
         e.preventDefault();
 
-        // PAYLOAD AJUSTADO EXACTAMENTE A TU SERIALIZER
-        const payload = {
+        // Estructura de datos alineada con ProduccionSerializer
+        const datosParaEnviar = {
             tipo: tipo,
-            unidades_resultantes: parseInt(unidades) || 0,
+            jabon_producido: parseInt(jabonSeleccionado),
+            unidades_resultantes: parseInt(unidades),
             notas: notas,
             detalles_insumos: filasInsumos.map(f => ({
-                insumo: parseInt(f.insumoId),            // ID numérico
-                cantidad_utilizada: parseFloat(f.cantidadReal) || 0,
-                lote_origen: f.lote || "N/A",
-                costo_unitario_momento: 0               // Requerido por tu modelo
+                insumo: parseInt(f.insumoId),
+                cantidad_utilizada: parseFloat(f.cantidadReal),
+                lote_origen: f.lote || "N/A"
+
             }))
         };
 
+        // Validación simple antes de enviar
+        if (datosParaEnviar.detalles_insumos.some(d => !d.insumo || isNaN(d.cantidad_utilizada))) {
+            alert("Por favor, completa todos los campos de insumos correctamente.");
+            return;
+        }
+
         try {
-            await axios.post('http://127.0.0.1:8000/api/produccion/', payload);
-            alert("¡Éxito! Producción guardada.");
-            window.location.reload(); // Recarga para limpiar todo
+            const res = await axios.post('http://127.0.0.1:8000/api/produccion/', datosParaEnviar);
+            alert("Producción registrada y stock actualizado con éxito");
+
+            // Opcional: Reiniciar formulario
+            setUnidades(0);
+            setNotas('');
+            setFilasInsumos([{ insumoId: '', cantidadReal: '', lote: '' }]);
+
         } catch (err) {
-            console.error("Error de Django:", err.response?.data);
-            alert("Error: " + JSON.stringify(err.response?.data));
+            console.error("Error del servidor:", err.response?.data);
+            // Mostrar error específico del backend (como falta de stock)
+            const mensajeError = err.response?.data?.non_field_errors ||
+                                 err.response?.data?.detalles_insumos ||
+                                 "Error desconocido al procesar la producción.";
+            alert("Error: " + JSON.stringify(mensajeError));
         }
     };
 
     return (
-        <div style={{ padding: '30px', maxWidth: '800px', margin: '0 auto' }}>
-            <h2>Nueva Producción</h2>
-            <form onSubmit={guardarProduccion}>
+        <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
+            <h2>Registrar Nueva Producción</h2>
+            <form onSubmit={manejarEnvio}>
+
+
                 <div style={{ marginBottom: '15px' }}>
-                    <label>Tipo:</label>
+                    <label>Producto a Elaborar (Jabón):</label>
+                    <select
+                        value={jabonSeleccionado}
+                        onChange={e => setJabonSeleccionado(e.target.value)}
+                        style={inputStyle}
+                        required
+                    >
+                        <option value="">Seleccione un jabón...</option>
+                        {jabones.map(j => (
+                            <option key={j.id} value={j.id}>{j.nombre}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <div style={{ marginBottom: '15px' }}>
+                    <label>Tipo de Producción:</label>
                     <select value={tipo} onChange={e => setTipo(e.target.value)} style={inputStyle}>
-                        <option value="ESTANDAR">Estándar</option>
-                        <option value="EXPERIMENTO">Experimento</option>
+                        <option value="ESTANDAR">Receta Estándar</option>
+                        <option value="EXPERIMENTO">Experimento/Nuevo</option>
                     </select>
                 </div>
 
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
-                        <tr>
+                        <tr style={{ textAlign: 'left', borderBottom: '2px solid #eee' }}>
                             <th>Insumo</th>
-                            <th>Cantidad</th>
+                            <th>Cantidad (g)</th>
                             <th>Lote</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -84,19 +133,21 @@ const Produccion = () => {
                                     <select
                                         value={fila.insumoId}
                                         onChange={e => manejarCambioFila(index, 'insumoId', e.target.value)}
-                                        required
                                         style={inputStyle}
+                                        required
                                     >
                                         <option value="">Seleccionar...</option>
-                                        {/* Aquí estaba el error: asegurar que recorremos el array correcto */}
-                                        {insumosDisponibles.map(i => (
-                                            <option key={i.id} value={i.id}>{i.nombre}</option>
+                                        {insumosDisponibles.map(ins => (
+                                            <option key={ins.id} value={ins.id}>
+                                                {ins.nombre} ({ins.cantidad_gramos}g disponibles)
+                                            </option>
                                         ))}
                                     </select>
                                 </td>
                                 <td>
                                     <input
                                         type="number"
+                                        placeholder="Ejem: 500"
                                         value={fila.cantidadReal}
                                         onChange={e => manejarCambioFila(index, 'cantidadReal', e.target.value)}
                                         style={inputStyle}
@@ -106,30 +157,78 @@ const Produccion = () => {
                                 <td>
                                     <input
                                         type="text"
+                                        placeholder="Lote"
                                         value={fila.lote}
                                         onChange={e => manejarCambioFila(index, 'lote', e.target.value)}
                                         style={inputStyle}
                                     />
                                 </td>
+                                <td>
+                                    <button
+                                        type="button"
+                                        onClick={() => eliminarFila(index)}
+                                        style={{ backgroundColor: '#ff4d4d', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
+                                    >
+                                        X
+                                    </button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
-                <button type="button" onClick={agregarFila} style={{ margin: '10px 0' }}>+ Añadir</button>
 
-                <div style={{ marginTop: '20px' }}>
-                    <label>Unidades Producidas:</label>
-                    <input type="number" value={unidades} onChange={e => setUnidades(e.target.value)} style={inputStyle} />
+                <button type="button" onClick={agregarFila} style={{ margin: '15px 0', padding: '8px 15px', cursor: 'pointer' }}>
+                    + Añadir Insumo
+                </button>
+
+                <div style={{ marginTop: '20px', display: 'flex', gap: '20px' }}>
+                    <div>
+                        <label style={{ display: 'block' }}>Unidades Resultantes:</label>
+                        <input
+                            type="number"
+                            value={unidades}
+                            onChange={e => setUnidades(e.target.value)}
+                            style={inputStyle}
+                            required
+                        />
+                    </div>
+                    <div style={{ flexGrow: 1 }}>
+                        <label style={{ display: 'block' }}>Notas:</label>
+                        <textarea
+                            value={notas}
+                            onChange={e => setNotas(e.target.value)}
+                            style={{ ...inputStyle, width: '100%', height: '60px' }}
+                        />
+                    </div>
                 </div>
 
-                <button type="submit" style={{ marginTop: '20px', backgroundColor: 'green', color: 'white', padding: '10px' }}>
-                    Finalizar y Descontar Stock
+                <button
+                    type="submit"
+                    style={{
+                        marginTop: '30px',
+                        backgroundColor: '#28a745',
+                        color: 'white',
+                        padding: '12px 20px',
+                        border: 'none',
+                        borderRadius: '5px',
+                        width: '100%',
+                        fontSize: '16px',
+                        cursor: 'pointer'
+                    }}
+                >
+                    Finalizar Producción y Descontar Stock
                 </button>
             </form>
         </div>
     );
 };
 
-const inputStyle = { padding: '8px', margin: '5px', borderRadius: '4px', border: '1px solid #ccc' };
+const inputStyle = {
+    padding: '8px',
+    margin: '5px 0',
+    borderRadius: '4px',
+    border: '1px solid #ccc',
+    boxSizing: 'border-box'
+};
 
 export default Produccion;
