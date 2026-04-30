@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Insumos, Jabon, ConsumoInsumo, SalidaJabon, DetalleProduccionInsumo, Produccion
 from django.db import transaction
+from  .services import ProduccionService
 
 class InsumoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -92,3 +93,18 @@ class ProduccionSerializer(serializers.ModelSerializer):
                 insumo.save()
 
             return produccion
+
+
+class ProduccionSerializer(serializers.ModelSerializer):
+    detalles_insumos = DetalleProduccionSerializer(many=True)
+
+    class Meta:
+        model = Produccion
+        fields = '__all__'
+
+    def create(self, validated_data):
+        # Extraemos los detalles para enviarlos al servicio por separado
+        detalles_data = validated_data.pop('detalles_insumos')
+
+        # Llamada al Service Layer
+        return ProduccionService.registrar_produccion(validated_data, detalles_data)
