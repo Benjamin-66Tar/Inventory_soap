@@ -8,6 +8,8 @@ const Produccion = () => {
     const [tipo, setTipo] = useState('ESTANDAR');
     const [unidades, setUnidades] = useState(0);
     const [notas, setNotas] = useState('');
+    const [tiempoCurado, setTiempoCurado] = useState('');
+    const [unidadTiempo, setUnidadTiempo] = useState('DIAS');
     const [filasInsumos, setFilasInsumos] = useState([
         { insumoId: '', cantidadReal: '', lote: '' }
     ]);
@@ -55,32 +57,28 @@ const Produccion = () => {
             jabon_producido: parseInt(jabonSeleccionado),
             unidades_resultantes: parseInt(unidades),
             notas: notas,
+            tiempo_curado: tiempoCurado === '' ? null : parseInt(tiempoCurado), // Convertir a null si está vacío
+            unidad_tiempo: unidadTiempo,
             detalles_insumos: filasInsumos.map(f => ({
                 insumo: parseInt(f.insumoId),
                 cantidad_utilizada: parseFloat(f.cantidadReal),
                 lote_origen: f.lote || "N/A"
-
             }))
         };
 
-        // Validación simple antes de enviar
         if (datosParaEnviar.detalles_insumos.some(d => !d.insumo || isNaN(d.cantidad_utilizada))) {
             alert("Por favor, completa todos los campos de insumos correctamente.");
             return;
         }
 
         try {
-            const res = await api.post('/produccion/', datosParaEnviar);
+            await api.post('/produccion/', datosParaEnviar);
             alert("Producción registrada y stock actualizado con éxito");
-
-            // Opcional: Reiniciar formulario
             setUnidades(0);
             setNotas('');
             setFilasInsumos([{ insumoId: '', cantidadReal: '', lote: '' }]);
-
         } catch (err) {
             console.error("Error del servidor:", err.response?.data);
-            // Mostrar error específico del backend (como falta de stock)
             const mensajeError = err.response?.data?.non_field_errors ||
                                  err.response?.data?.detalles_insumos ||
                                  "Error desconocido al procesar la producción.";
@@ -92,7 +90,6 @@ const Produccion = () => {
         <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
             <h2>Registrar Nueva Producción</h2>
             <form onSubmit={manejarEnvio}>
-
 
                 <div style={{ marginBottom: '15px' }}>
                     <label>Producto a Elaborar (Jabón):</label>
@@ -202,6 +199,42 @@ const Produccion = () => {
                     </div>
                 </div>
 
+                <div style={{ marginTop: '20px', padding: '15px', border: '1px solid #e0e0e0', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
+                    <label><strong>Configuración de Curado:</strong></label>
+                    <div style={{ marginTop: '10px' }}>
+                        <label>Días de curado (Entrada libre): </label>
+                        <input
+                            type="number"
+                            value={tiempoCurado}
+                            placeholder="28 (Valor por defecto)"
+                            onChange={(e) => {
+                                setTiempoCurado(e.target.value);
+                                setUnidadTiempo('DIAS'); // Esto fuerza a que el backend use la lógica de 'DIAS'[cite: 1, 3]
+                            }}
+                            style={inputStyle}
+                        />
+                        <span style={{ marginLeft: '10px', fontSize: '0.9em', color: '#666' }}>
+                            Unidad: {unidadTiempo}
+                        </span>
+                    </div>
+                    <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
+                        <button
+                            type="button"
+                            onClick={() => { setTiempoCurado(4); setUnidadTiempo('SEMANAS'); }}
+                            style={{ ...btnStyleSecundario, backgroundColor: (tiempoCurado === 4 && unidadTiempo === 'SEMANAS') ? '#007bff' : '#6c757d' }}
+                        >
+                            4 Semanas
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => { setTiempoCurado(2); setUnidadTiempo('MESES'); }}
+                            style={{ ...btnStyleSecundario, backgroundColor: (tiempoCurado === 2 && unidadTiempo === 'MESES') ? '#007bff' : '#6c757d' }}
+                        >
+                            2 Meses
+                        </button>
+                    </div>
+                </div>
+
                 <button
                     type="submit"
                     style={{
@@ -229,6 +262,16 @@ const inputStyle = {
     borderRadius: '4px',
     border: '1px solid #ccc',
     boxSizing: 'border-box'
+};
+
+const btnStyleSecundario = {
+    padding: '8px 12px',
+    border: 'none',
+    borderRadius: '4px',
+    color: 'white',
+    cursor: 'pointer',
+    fontSize: '14px',
+    transition: 'background-color 0.3s'
 };
 
 export default Produccion;

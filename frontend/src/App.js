@@ -4,6 +4,7 @@ import Inventario from './Inventario'; // Importamos tu nuevo componente
 import Layout from './components/Layout';
 import Produccion from './Produccion';
 import HistorialProduccion from './HistorialProduccion';
+import Curado from './Curado';
 
 
 
@@ -20,6 +21,7 @@ function App() {
           {/* Secciones de navegación */}
           <Route path="inventario" element={<Inventario />} />
           <Route path="historial" element={<HistorialProduccion />} />
+          <Route path="/curado" element={<Curado />} />
           {/* Escala aquí: nuevas rutas como 'ventas' o 'reportes' */}
         </Route>
       </Routes>
