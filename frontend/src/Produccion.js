@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from './api/api';
 
 const Produccion = () => {
     const [insumosDisponibles, setInsumosDisponibles] = useState([]);
@@ -14,14 +14,14 @@ const Produccion = () => {
 
     // Carga de insumos disponibles desde el backend
     useEffect(() => {
-        axios.get('http://127.0.0.1:8000/api/insumos/')
+        api.get('/insumos/')
             .then(res => {
                 const data = Array.isArray(res.data) ? res.data : (res.data.results || []);
                 setInsumosDisponibles(data);
             })
             .catch(err => console.error("Error al cargar insumos:", err));
 
-        axios.get('http://127.0.0.1:8000/api/jabones/')
+        api.get('/jabones/')
             .then(res => {
                 const data = Array.isArray(res.data) ? res.data : (res.data.results || []);
                 setJabones(data);
@@ -70,7 +70,7 @@ const Produccion = () => {
         }
 
         try {
-            const res = await axios.post('http://127.0.0.1:8000/api/produccion/', datosParaEnviar);
+            const res = await api.post('/produccion/', datosParaEnviar);
             alert("Producción registrada y stock actualizado con éxito");
 
             // Opcional: Reiniciar formulario

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Inventario from './Inventario'; // Importamos tu nuevo componente
 import Layout from './components/Layout';
 import Produccion from './Produccion';
+import HistorialProduccion from './HistorialProduccion';
 
 
 
@@ -18,7 +19,7 @@ function App() {
 
           {/* Secciones de navegación */}
           <Route path="inventario" element={<Inventario />} />
-
+          <Route path="historial" element={<HistorialProduccion />} />
           {/* Escala aquí: nuevas rutas como 'ventas' o 'reportes' */}
         </Route>
       </Routes>

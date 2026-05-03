@@ -45,6 +45,7 @@ class DetalleProduccionSerializer(serializers.ModelSerializer):
 
 
 class ProduccionSerializer(serializers.ModelSerializer):
+    jabon_nombre = serializers.ReadOnlyField(source='jabon_producido.nombre')
     detalles_insumos = DetalleProduccionSerializer(many=True)
 
     class Meta:
@@ -53,6 +54,7 @@ class ProduccionSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         detalles_data = validated_data.pop('detalles_insumos')
+
 
         with transaction.atomic():
             # 1. VALIDAR STOCK PRIMERO (Antes de crear nada)

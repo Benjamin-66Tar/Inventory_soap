@@ -94,6 +94,10 @@ class Produccion(models.Model):
     notas = models.TextField(blank=True)
     costo_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
+    en_curado = models.BooleanField(default=True)
+    fecha_termino_curado = models.DateField(null=True, blank=True)
+    completada = models.BooleanField(default=False)
+
 
 class DetalleProduccionInsumo(models.Model):
     """Corazón de la trazabilidad: relaciona la producción con lotes específicos de insumos"""
