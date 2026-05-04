@@ -22,24 +22,26 @@ class ProduccionService:
         tiempo = datos_produccion.pop('tiempo_curado', None)
         unidad = datos_produccion.pop('unidad_tiempo', 'DIAS')
 
-        # Usamos un bloque try/except para capturar valores que no sean números
         try:
-            # REGLA LÓGICA: Si el usuario define un tiempo válido (ej. 1, 3, 15)
-            if tiempo is not None and str(tiempo).strip() != "" and int(tiempo) > 0:
+            # Verificamos si tiempo existe y no es nulo/vacío
+            if tiempo is not None and str(tiempo).strip() != "":
                 valor = int(tiempo)
-                if unidad == 'DIAS':
-                    delta = timedelta(days=valor)
-                elif unidad == 'SEMANAS':
-                    delta = timedelta(weeks=valor)
-                elif unidad == 'MESES':
-                    delta = timedelta(days=valor * 30)
+                if valor > 0:
+                    if unidad == 'DIAS':
+                        delta = timedelta(days=valor)
+                    elif unidad == 'SEMANAS':
+                        delta = timedelta(weeks=valor)
+                    elif unidad == 'MESES':
+                        delta = timedelta(days=valor * 30)
 
-                fecha_fin = timezone.now().date() + delta
+                    fecha_fin = timezone.now().date() + delta
+                else:
+                    # Si el usuario puso 0, aplicamos el default
+                    fecha_fin = timezone.now().date() + timedelta(days=28)
             else:
-                # REGLA LÓGICA: Si NO define días o es 0 -> 28 días por defecto[cite: 1, 8]
+                # Si tiempo es None o vacío
                 fecha_fin = timezone.now().date() + timedelta(days=28)
         except (ValueError, TypeError):
-            # Si el dato llega corrupto, aplicamos el estándar de seguridad de 28 días
             fecha_fin = timezone.now().date() + timedelta(days=28)
 
         # 2. Crear el registro con la fecha final calculada[cite: 8]

@@ -48,6 +48,9 @@ class ProduccionSerializer(serializers.ModelSerializer):
     jabon_nombre = serializers.ReadOnlyField(source='jabon_producido.nombre')
     detalles_insumos = DetalleProduccionSerializer(many=True)
 
+    tiempo_curado = serializers.IntegerField(write_only=True, required=False, allow_null=True)
+    unidad_tiempo = serializers.CharField(write_only=True, required=False)
+
     class Meta:
         model = Produccion
         fields = '__all__'

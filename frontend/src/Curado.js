@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from './api/api'; // Tu instancia centralizada
+import api from './api/api';
 
 const Curado = () => {
     const [lotes, setLotes] = useState([]);
@@ -7,17 +7,32 @@ const Curado = () => {
     useEffect(() => {
         api.get('/produccion/')
             .then(res => {
-                // Filtramos solo los lotes que están en proceso de curado
                 const enEspera = res.data.filter(p => p.en_curado);
                 setLotes(enEspera);
             })
             .catch(err => console.error("Error al cargar lotes:", err));
     }, []);
 
+    // Función corregida y cerrada correctamente
+    const calcularProgreso = (fechaInicio, fechaFin) => {
+        if (!fechaInicio || !fechaFin) return 0;
+
+        const inicio = new Date(fechaInicio).getTime();
+        const fin = new Date(fechaFin).getTime();
+        const hoy = new Date().getTime();
+
+        const total = fin - inicio;
+        const transcurrido = hoy - inicio;
+
+        if (total <= 0) return 100;
+
+        const porcentaje = (transcurrido / total) * 100;
+        return Math.min(100, Math.max(0, porcentaje));
+    }; // <-- Aquí estaba el error, faltaba cerrar esta llave
+
     const calcularDiasRestantes = (fechaFin) => {
         const hoy = new Date();
         const fin = new Date(fechaFin);
-        // Establecer horas a cero para comparar solo fechas
         hoy.setHours(0, 0, 0, 0);
         fin.setHours(0, 0, 0, 0);
 
@@ -42,11 +57,8 @@ const Curado = () => {
                 {lotes.map(lote => {
                     const diasRestantes = calcularDiasRestantes(lote.fecha_termino_curado);
 
-                    // Lógica de progreso:
-                    // Usamos 28 como base estándar, pero si el curado fue manual y mayor a 28,
-                    // ajustamos el máximo para que la barra no se desborde.
-                    const baseCurado = 28;
-                    const progreso = Math.max(0, baseCurado - diasRestantes);
+                    // Usamos fecha_elaboracion que es el nombre real en tu base de datos
+                    const progreso = calcularProgreso(lote.fecha_elaboracion, lote.fecha_termino_curado);
 
                     return (
                         <div key={lote.id} style={cardStyle(diasRestantes)}>
@@ -59,7 +71,7 @@ const Curado = () => {
                                 </p>
                                 <progress
                                     value={progreso}
-                                    max={baseCurado}
+                                    max="100"
                                     style={{ width: '100%', height: '12px' }}
                                 />
                             </div>
@@ -80,7 +92,6 @@ const Curado = () => {
     );
 };
 
-// Estilos dinámicos para las tarjetas[cite: 5]
 const cardStyle = (dias) => ({
     border: '1px solid #ddd',
     padding: '20px',
