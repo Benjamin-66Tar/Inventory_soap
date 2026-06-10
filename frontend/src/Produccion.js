@@ -57,12 +57,13 @@ const Produccion = () => {
             jabon_producido: parseInt(jabonSeleccionado),
             unidades_resultantes: parseInt(unidades),
             notas: notas,
-            tiempo_curado: tiempoCurado === '' ? null : parseInt(tiempoCurado), // Convertir a null si está vacío
+            tiempo_curado: tiempoCurado === '' ? 0 : parseInt(tiempoCurado), // Convertir a null si está vacío
             unidad_tiempo: unidadTiempo,
             detalles_insumos: filasInsumos.map(f => ({
                 insumo: parseInt(f.insumoId),
                 cantidad_utilizada: parseFloat(f.cantidadReal),
-                lote_origen: f.lote || "N/A"
+                lote_origen: f.lote || "N/A",
+                costo_unitario_momento: 0.0
             }))
         };
 

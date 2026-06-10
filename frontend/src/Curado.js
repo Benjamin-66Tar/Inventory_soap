@@ -46,7 +46,9 @@ const Curado = () => {
             alert("¡Jabón movido al inventario!");
             setLotes(lotes.filter(l => l.id !== id));
         } catch (err) {
-            alert("Error al finalizar curado");
+            const msg = err.response?.data?.detail || "Error en el servidor";
+            alert("Error al finalizar curado: " + msg);
+            console.error("Error completo:", err.response);
         }
     };
 

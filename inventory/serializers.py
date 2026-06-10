@@ -16,10 +16,23 @@ class InsumoSerializer(serializers.ModelSerializer):
         return value
 
 class JabonSerializer(serializers.ModelSerializer):
+    cantidad_curando = serializers.SerializerMethodField()
+    cantidad_lista = serializers.SerializerMethodField()
+
     class Meta:
         model = Jabon
+        fields = [
+            'id', 'nombre', 'cantidad', 'categoria', 'fecha_elaboracion', 
+            'peso_gramos', 'cantidad_curando', 'cantidad_lista'
+        ]
 
-        fields = ['id', 'nombre', 'cantidad', 'categoria', 'fecha_elaboracion', 'peso_gramos']
+    def get_cantidad_curando(self, obj):
+        from django.db.models import Sum
+        total = obj.producciones.filter(en_curado=True).aggregate(Sum('unidades_resultantes'))['unidades_resultantes__sum']
+        return total if total is not None else 0
+
+    def get_cantidad_lista(self, obj):
+        return obj.cantidad
 
 class ConsumoInsumoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -46,7 +59,7 @@ class DetalleProduccionSerializer(serializers.ModelSerializer):
 
 class ProduccionSerializer(serializers.ModelSerializer):
     jabon_nombre = serializers.ReadOnlyField(source='jabon_producido.nombre')
-    detalles_insumos = DetalleProduccionSerializer(many=True)
+    detalles_insumos = DetalleProduccionSerializer(many=True, required=False)
 
     tiempo_curado = serializers.IntegerField(write_only=True, required=False, allow_null=True)
     unidad_tiempo = serializers.CharField(write_only=True, required=False)

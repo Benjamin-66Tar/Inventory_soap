@@ -24,7 +24,7 @@ class ProduccionService:
 
         try:
             # Verificamos si tiempo existe y no es nulo/vacío
-            if tiempo is not None and str(tiempo).strip() != "":
+            if tiempo is not None and str(tiempo).strip() not in ["", "0"]:
                 valor = int(tiempo)
                 if valor > 0:
                     if unidad == 'DIAS':
@@ -51,17 +51,21 @@ class ProduccionService:
             fecha_termino_curado=fecha_fin
         )
 
-        # 3. Actualizar Stock del Jabón Terminado[cite: 8]
-        if produccion.jabon_producido and produccion.unidades_resultantes > 0:
-            jabon = produccion.jabon_producido
-            jabon.cantidad += produccion.unidades_resultantes
-            jabon.save()
+        # 3. Actualizar Stock del Jabón Terminado
+        # Nota: Ya no sumamos las unidades de inmediato, porque entran en proceso de curado.
+        # Se sumarán al inventario cuando finalice el curado (pasar_inventario).
+        # if produccion.jabon_producido and produccion.unidades_resultantes > 0:
+        #     jabon = produccion.jabon_producido
+        #     jabon.cantidad += produccion.unidades_resultantes
+        #     jabon.save()
 
         # 4. Crear Detalles y Descontar Stock de Insumos[cite: 8]
         for detalle in detalles_data:
             insumo = detalle['insumo']
             cantidad = float(detalle['cantidad_utilizada'])
-            costo = detalle.get('costo_unitario_momento') or getattr(insumo, 'precio_unitario', 0)
+            costo = detalle.get('costo_unitario_momento')
+            if costo is None or costo == "":
+                costo = getattr(insumo, 'precio_unitario', 0.0)
 
             DetalleProduccionInsumo.objects.create(
                 produccion=produccion,
