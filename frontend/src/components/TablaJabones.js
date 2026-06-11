@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const TablaJabones = ({ datos = [], onAbrirFormulario }) => {
+    const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('');
     const [selectedJabon, setSelectedJabon] = useState(null);
@@ -56,6 +58,7 @@ const TablaJabones = ({ datos = [], onAbrirFormulario }) => {
                         <th>Categoría</th>
                         <th>Peso Unitario</th>
                         <th>Estado</th>
+                        <th>Acción</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -81,6 +84,25 @@ const TablaJabones = ({ datos = [], onAbrirFormulario }) => {
                                 <td>{j.peso_gramos}g</td>
                                 <td>
                                     {esCritico ? <span style={{ color: 'red' }}>⚠️ REABASTECER</span> : '✅ OK'}
+                                </td>
+                                <td>
+                                    <button
+                                        onClick={() => navigate('/produccion', { state: { preselectedJabonId: j.id } })}
+                                        style={{
+                                            backgroundColor: '#28a745',
+                                            color: 'white',
+                                            border: 'none',
+                                            padding: '6px 12px',
+                                            borderRadius: '6px',
+                                            cursor: 'pointer',
+                                            fontSize: '13px',
+                                            fontWeight: 'bold',
+                                            boxShadow: '0 2px 4px rgba(40,167,69,0.15)',
+                                            transition: 'background-color 0.2s'
+                                        }}
+                                    >
+                                        Fabricar 🛠️
+                                    </button>
                                 </td>
                             </tr>
                         );

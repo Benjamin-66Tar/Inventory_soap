@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import api from './api/api';
+import FormularioJabon from './components/FormularioJabon';
 
 const Produccion = () => {
+    const location = useLocation();
     const [insumosDisponibles, setInsumosDisponibles] = useState([]);
     const [jabones, setJabones] = useState([]);
     const [jabonSeleccionado, setJabonSeleccionado] = useState('');
@@ -13,6 +16,7 @@ const Produccion = () => {
     const [filasInsumos, setFilasInsumos] = useState([
         { insumoId: '', cantidadReal: '', lote: '' }
     ]);
+    const [showQuickCreateJabon, setShowQuickCreateJabon] = useState(false);
 
     // Carga de insumos disponibles desde el backend
     useEffect(() => {
@@ -30,6 +34,18 @@ const Produccion = () => {
             })
             .catch(err => console.error("Error al cargar jabones:", err));
     }, []);
+
+    useEffect(() => {
+        if (location.state && location.state.preselectedJabonId) {
+            setJabonSeleccionado(location.state.preselectedJabonId.toString());
+        }
+    }, [location.state]);
+
+    const handleJabonAgregado = (nuevoJabon) => {
+        setJabones(prev => [...prev, nuevoJabon]);
+        setJabonSeleccionado(nuevoJabon.id.toString());
+        setShowQuickCreateJabon(false);
+    };
 
     const agregarFila = () => {
         setFilasInsumos([...filasInsumos, { insumoId: '', cantidadReal: '', lote: '' }]);
@@ -93,18 +109,43 @@ const Produccion = () => {
             <form onSubmit={manejarEnvio}>
 
                 <div style={{ marginBottom: '15px' }}>
-                    <label>Producto a Elaborar (Jabón):</label>
-                    <select
-                        value={jabonSeleccionado}
-                        onChange={e => setJabonSeleccionado(e.target.value)}
-                        style={inputStyle}
-                        required
-                    >
-                        <option value="">Seleccione un jabón...</option>
-                        {jabones.map(j => (
-                            <option key={j.id} value={j.id}>{j.nombre}</option>
-                        ))}
-                    </select>
+                    <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Producto a Elaborar (Jabón):</label>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <select
+                            value={jabonSeleccionado}
+                            onChange={e => setJabonSeleccionado(e.target.value)}
+                            style={{ ...inputStyle, flex: 1, margin: 0 }}
+                            required
+                        >
+                            <option value="">Seleccione un jabón...</option>
+                            {jabones.map(j => (
+                                <option key={j.id} value={j.id}>{j.nombre}</option>
+                            ))}
+                        </select>
+                        <button
+                            type="button"
+                            onClick={() => setShowQuickCreateJabon(true)}
+                            style={{
+                                backgroundColor: '#28a745',
+                                color: 'white',
+                                border: 'none',
+                                padding: '8px 15px',
+                                borderRadius: '4px',
+                                fontSize: '18px',
+                                cursor: 'pointer',
+                                fontWeight: 'bold',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: '36px',
+                                width: '36px',
+                                margin: 0
+                            }}
+                            title="Registrar nuevo perfil de Jabón"
+                        >
+                            +
+                        </button>
+                    </div>
                 </div>
 
                 <div style={{ marginBottom: '15px' }}>
@@ -253,6 +294,13 @@ const Produccion = () => {
                     Finalizar Producción y Descontar Stock
                 </button>
             </form>
+
+            {showQuickCreateJabon && (
+                <FormularioJabon
+                    onJabonAgregado={handleJabonAgregado}
+                    alCerrar={() => setShowQuickCreateJabon(false)}
+                />
+            )}
         </div>
     );
 };
