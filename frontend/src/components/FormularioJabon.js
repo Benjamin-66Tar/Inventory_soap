@@ -1,6 +1,6 @@
 // frontend/src/components/FormularioJabon.js
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api/api';
 
 const FormularioJabon = ({ onJabonAgregado, alCerrar }) => {
     const [formData, setFormData] = useState({
@@ -15,7 +15,7 @@ const FormularioJabon = ({ onJabonAgregado, alCerrar }) => {
         e.preventDefault();
         try {
             // Envío de datos al ViewSet de Jabon en Django
-            const res = await axios.post('http://127.0.0.1:8000/api/jabones/', {
+            const res = await api.post('/jabones/', {
                 ...formData,
                 cantidad: 0 // Garantiza que empiece en 0 pzs
             });

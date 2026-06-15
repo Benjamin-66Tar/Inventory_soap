@@ -1,6 +1,6 @@
 // frontend/src/components/FormularioInsumo.js
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api/api';
 
 const FormularioInsumo = ({ onInsumoAgregado, alCerrar }) => {
     const [formData, setFormData] = useState({
@@ -14,7 +14,7 @@ const FormularioInsumo = ({ onInsumoAgregado, alCerrar }) => {
         e.preventDefault();
         try {
             // Asegúrate de que la URL coincida con tu endpoint de Django para insumos
-            const res = await axios.post('http://127.0.0.1:8000/api/insumos/', formData);
+            const res = await api.post('/insumos/', formData);
             onInsumoAgregado(res.data);
             alCerrar();
         } catch (error) {

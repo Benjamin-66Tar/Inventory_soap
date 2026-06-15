@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from './api/api';
 import TablaInsumos from './components/TablaInsumos';
 import TablaJabones from './components/TablaJabones';
 import FormularioJabon from './components/FormularioJabon';
@@ -27,8 +27,8 @@ const Inventario = () => {
 
     useEffect(() => {
         // Carga centralizada de datos para mantener la sincronización
-        axios.get('http://127.0.0.1:8000/api/insumos/').then(res => setInsumos(res.data));
-        axios.get('http://127.0.0.1:8000/api/jabones/').then(res => setJabones(res.data));
+        api.get('/insumos/').then(res => setInsumos(res.data));
+        api.get('/jabones/').then(res => setJabones(res.data));
     }, []);
 
     return (
