@@ -1,18 +1,26 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../api/api';
 
-const TablaJabones = ({ datos = [], onAbrirFormulario }) => {
+const TablaJabones = ({ datos = [], onAbrirFormulario, config }) => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('');
     const [selectedJabon, setSelectedJabon] = useState(null);
-    const UMBRAL_CRITICO = 5;
+    const [categorias, setCategorias] = useState([]);
+    const UMBRAL_CRITICO = config ? config.umbral_critico_stock : 5;
+
+    useEffect(() => {
+        api.get('/categorias/')
+            .then(res => setCategorias(res.data))
+            .catch(err => console.error('Error al cargar categorías:', err));
+    }, []);
 
     // Lógica de filtrado memorizada para optimizar el rendimiento
     const filteredJabones = useMemo(() => {
         return datos.filter(j => {
             const coincideNombre = j.nombre.toLowerCase().includes(searchTerm.toLowerCase());
-            const coincideCategoria = categoryFilter === '' || j.categoria === categoryFilter;
+            const coincideCategoria = categoryFilter === '' || String(j.categoria) === categoryFilter;
             return coincideNombre && coincideCategoria;
         });
     }, [datos, searchTerm, categoryFilter]);
@@ -45,8 +53,9 @@ const TablaJabones = ({ datos = [], onAbrirFormulario }) => {
                     style={{ padding: '8px' }}
                 >
                     <option value="">Todas las categorías</option>
-                    <option value="CP">Cuidado Personal</option>
-                    <option value="LAV">Lavandería</option>
+                    {categorias.map(cat => (
+                        <option key={cat.id} value={String(cat.id)}>{cat.nombre}</option>
+                    ))}
                 </select>
             </div>
 
@@ -80,8 +89,8 @@ const TablaJabones = ({ datos = [], onAbrirFormulario }) => {
                                 >
                                     {j.cantidad} pzs
                                 </td>
-                                <td>{j.categoria === 'CP' ? 'Cuidado Personal' : 'Lavandería'}</td>
-                                <td>{j.peso_gramos}g</td>
+                                <td>{j.categoria_nombre || 'Sin Categoría'}</td>
+                                <td>{j.peso_gramos}{config ? config.unidad_peso : 'g'}</td>
                                 <td>
                                     {esCritico ? <span style={{ color: 'red' }}>⚠️ REABASTECER</span> : '✅ OK'}
                                 </td>

@@ -5,8 +5,7 @@ import Layout from './components/Layout';
 import Produccion from './Produccion';
 import HistorialProduccion from './HistorialProduccion';
 import Curado from './Curado';
-
-
+import ConfiguracionPanel from './ConfiguracionPanel';
 
 function App() {
   return (
@@ -14,14 +13,15 @@ function App() {
       <Routes>
         {/* Ruta principal que contiene el Sidebar y el Outlet */}
         <Route path="/" element={<Layout />}>
-        <Route path="produccion" element={<Produccion />} />
+          <Route path="produccion" element={<Produccion />} />
           {/* Redirección automática al inventario al entrar a la app */}
           <Route index element={<Navigate to="/inventario" replace />} />
 
           {/* Secciones de navegación */}
           <Route path="inventario" element={<Inventario />} />
           <Route path="historial" element={<HistorialProduccion />} />
-          <Route path="/curado" element={<Curado />} />
+          <Route path="curado" element={<Curado />} />
+          <Route path="configuracion" element={<ConfiguracionPanel />} />
           {/* Escala aquí: nuevas rutas como 'ventas' o 'reportes' */}
         </Route>
       </Routes>

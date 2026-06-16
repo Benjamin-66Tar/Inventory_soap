@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Insumos, Jabon, ConsumoInsumo, SalidaJabon, DetalleProduccionInsumo, Produccion
+from .models import Insumos, Jabon, ConsumoInsumo, SalidaJabon, DetalleProduccionInsumo, Produccion, Categoria, ConfiguracionSistema
 from django.db import transaction
 from  .services import ProduccionService
 
@@ -15,14 +15,25 @@ class InsumoSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("¡Cuidado! No puedes tener inventario negativo.")
         return value
 
+class CategoriaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Categoria
+        fields = ['id', 'nombre']
+
+class ConfiguracionSistemaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ConfiguracionSistema
+        fields = ['unidad_peso', 'dias_curado_defecto', 'umbral_critico_stock']
+
 class JabonSerializer(serializers.ModelSerializer):
+    categoria_nombre = serializers.ReadOnlyField(source='categoria.nombre')
     cantidad_curando = serializers.SerializerMethodField()
     cantidad_lista = serializers.SerializerMethodField()
 
     class Meta:
         model = Jabon
         fields = [
-            'id', 'nombre', 'cantidad', 'categoria', 'fecha_elaboracion', 
+            'id', 'nombre', 'cantidad', 'categoria', 'categoria_nombre', 'fecha_elaboracion', 
             'peso_gramos', 'cantidad_curando', 'cantidad_lista'
         ]
 

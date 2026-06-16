@@ -13,6 +13,7 @@ const Inventario = () => {
     // Estados para controlar la visibilidad de los modales
     const [showModal, setShowModal] = useState(false);
     const [showModalInsumo, setShowModalInsumo] = useState(false);
+    const [config, setConfig] = useState(null);
 
     // Funciones para actualizar el estado local tras agregar un registro
     const agregarNuevoJabon = (nuevoJabon) => {
@@ -22,18 +23,17 @@ const Inventario = () => {
     const agregarNuevoInsumo = (nuevoInsumo) => {
         setInsumos([...insumos, nuevoInsumo]);
     };
-    // En el return, podrías mostrar el modal:
-    {showModal && <FormularioJabon onJabonAgregado={agregarNuevoJabon} alCerrar={() => setShowModal(false)} />}
 
     useEffect(() => {
         // Carga centralizada de datos para mantener la sincronización
         api.get('/insumos/').then(res => setInsumos(res.data));
         api.get('/jabones/').then(res => setJabones(res.data));
+        api.get('/configuracion/').then(res => setConfig(res.data)).catch(err => console.error(err));
     }, []);
 
     return (
         <div style={{ padding: '20px' }}>
-            <h1>Gestión de Inventario</h1>
+            <h1>Gestión de Inventario - Benys</h1>
 
             {/* Selector de Tabla (Tabs) */}
             <div style={{ marginBottom: '20px', borderBottom: '2px solid #ccc' }}>
@@ -57,11 +57,13 @@ const Inventario = () => {
                 <TablaJabones
                     datos={jabones}
                     onAbrirFormulario={() => setShowModal(true)}
+                    config={config}
                 />
             ) : (
-                <TablaInsumos datos={insumos}
+                <TablaInsumos 
                     datos={insumos}
                     onAbrirFormulario={() => setShowModalInsumo(true)}
+                    config={config}
                 />
             )}
             </div>
@@ -70,6 +72,7 @@ const Inventario = () => {
                 <FormularioJabon
                     onJabonAgregado={agregarNuevoJabon}
                     alCerrar={() => setShowModal(false)}
+                    config={config}
                 />
             )}
 

@@ -1,8 +1,28 @@
-from rest_framework import viewsets
-from .models import Insumos, Jabon, ConsumoInsumo, SalidaJabon, Produccion
-from .serializers import InsumoSerializer, JabonSerializer, ConsumoInsumoSerializer, SalidaJabonSerializer, ProduccionSerializer
+from rest_framework import viewsets, status
+from rest_framework.views import APIView
+from .models import Insumos, Jabon, ConsumoInsumo, SalidaJabon, Produccion, Categoria, ConfiguracionSistema
+from .serializers import InsumoSerializer, JabonSerializer, ConsumoInsumoSerializer, SalidaJabonSerializer, ProduccionSerializer, CategoriaSerializer, ConfiguracionSistemaSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
+class CategoriaViewSet(viewsets.ModelViewSet):
+    queryset = Categoria.objects.all()
+    serializer_class = CategoriaSerializer
+
+class ConfiguracionSistemaView(APIView):
+    def get(self, request):
+        config = ConfiguracionSistema.get_solo()
+        serializer = ConfiguracionSistemaSerializer(config)
+        return Response(serializer.data)
+
+    def put(self, request):
+        config = ConfiguracionSistema.get_solo()
+        serializer = ConfiguracionSistemaSerializer(config, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class InsumoViewSet(viewsets.ModelViewSet):
     queryset = Insumos.objects.all()

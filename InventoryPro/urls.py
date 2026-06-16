@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include, re_path
 from rest_framework.routers import DefaultRouter
-from inventory.views import InsumoViewSet, JabonViewSet, ConsumoInsumoViewSet, SalidaJabonViewSet, ProduccionViewSet
+from inventory.views import InsumoViewSet, JabonViewSet, ConsumoInsumoViewSet, SalidaJabonViewSet, ProduccionViewSet, CategoriaViewSet, ConfiguracionSistemaView
 from django.views.generic import TemplateView
 from django.views.static import serve
 from django.conf import settings
@@ -13,9 +13,11 @@ router.register(r'jabones', JabonViewSet)
 router.register(r'consumos', ConsumoInsumoViewSet)
 router.register(r'salidas', SalidaJabonViewSet)
 router.register(r'produccion', ProduccionViewSet)
+router.register(r'categorias', CategoriaViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),
+    path('api/configuracion/', ConfiguracionSistemaView.as_view()),
     path('admin/', admin.site.urls), # Agrega esta línea para habilitar el panel
     
     # Servir archivos estáticos del root de React (favicon, manifest, etc.)

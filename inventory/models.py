@@ -12,27 +12,47 @@ class Insumos(models.Model):
         #Se mostrar el archivo administrador de Django y otros lugares
         return self.nombre
 
-class Categoria(models.TextChoices):
+class ConfiguracionSistema(models.Model):
+    unidad_peso = models.CharField(max_length=10, default='g')  # 'g', 'oz', 'pzs'
+    dias_curado_defecto = models.IntegerField(default=28)
+    umbral_critico_stock = models.IntegerField(default=5)
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def get_solo(cls):
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
+
+    def __str__(self):
+        return "Configuración Global del Sistema"
+
+class CategoriaEnum(models.TextChoices):
     LAVANDERIA = 'LAV', 'Lavandería y Hogar'
     CUIDADO_PERSONAL = 'CP', 'Cuidado Personal y Piel'
 
-class Jabon(models.Model):
+class Categoria(models.Model):
+    nombre = models.CharField(max_length=100, unique=True)
 
+    def __str__(self):
+        return self.nombre
+
+class Jabon(models.Model):
     nombre = models.CharField(max_length=100)
     cantidad = models.IntegerField(default=0)
-
-    categoria = models.CharField(
-        max_length=3,
-        choices=Categoria.choices,
-        default=Categoria.CUIDADO_PERSONAL
+    categoria = models.ForeignKey(
+        'Categoria',
+        on_delete=models.PROTECT,
+        related_name='jabones'
     )
-
     fecha_elaboracion = models.DateField()
     peso_gramos = models.FloatField()
 
     def __str__(self):
-        # Ahora el __str__ mostrará el nombre legible (ej: "Jabón de Avena (Cuidado Personal y Piel)")
-        return f"{self.nombre} ({self.get_categoria_display()})"
+        cat_nombre = self.categoria.nombre if self.categoria else "Sin Categoría"
+        return f"{self.nombre} ({cat_nombre})"
 
 class ConsumoInsumo(models.Model):
     insumo = models.ForeignKey(Insumos, on_delete=models.CASCADE, related_name='consumos')

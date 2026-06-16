@@ -1,7 +1,7 @@
 // 1. Importación corregida de los hooks
 import React, { useState, useMemo } from 'react';
 
-const TablaInsumos = ({ datos = [], onAbrirFormulario }) => {
+const TablaInsumos = ({ datos = [], onAbrirFormulario, config }) => {
     // 2. Estados para la búsqueda y el filtro
     const [searchTerm, setSearchTerm] = useState('');
     const [providerFilter, setProviderFilter] = useState('');
@@ -57,7 +57,7 @@ const TablaInsumos = ({ datos = [], onAbrirFormulario }) => {
                 <thead>
                     <tr style={{ backgroundColor: '#f2f2f2' }}>
                         <th>Nombre</th>
-                        <th>Cantidad (g)</th>
+                        <th>Cantidad ({config ? config.unidad_peso : 'g'})</th>
                         <th>Proveedor</th>
                         <th>Fecha de Ingreso</th>
                     </tr>
@@ -68,7 +68,7 @@ const TablaInsumos = ({ datos = [], onAbrirFormulario }) => {
                         filteredInsumos.map(i => (
                             <tr key={i.id}>
                                 <td>{i.nombre}</td>
-                                <td>{i.cantidad_gramos} g</td>
+                                <td>{i.cantidad_gramos} {config ? config.unidad_peso : 'g'}</td>
                                 <td>{i.proveedor}</td>
                                 <td>{i.fecha_ingreso}</td>
                             </tr>

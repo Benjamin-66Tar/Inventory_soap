@@ -165,14 +165,15 @@ const Sidebar = () => {
 
       {/* 3. Footer del Sistema */}
       <div style={footerStyle}>
-        <button 
-          style={getFooterBtnStyle(hoveredFooter === 'config', false)}
+        <NavLink 
+          to="/configuracion"
+          style={({ isActive }) => ({ ...getFooterBtnStyle(hoveredFooter === 'config' || isActive, false), textDecoration: 'none' })}
           onMouseEnter={() => setHoveredFooter('config')}
           onMouseLeave={() => setHoveredFooter(null)}
         >
           <span style={{ fontSize: '16px', minWidth: '24px', textAlign: 'center' }}>⚙️</span>
           {isOpen && <span>Configuración</span>}
-        </button>
+        </NavLink>
         <button 
           style={getFooterBtnStyle(hoveredFooter === 'logout', true)}
           onMouseEnter={() => setHoveredFooter('logout')}

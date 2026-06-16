@@ -1,15 +1,29 @@
-// frontend/src/components/FormularioJabon.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../api/api';
 
-const FormularioJabon = ({ onJabonAgregado, alCerrar }) => {
+const FormularioJabon = ({ onJabonAgregado, alCerrar, config }) => {
+    const [categorias, setCategorias] = useState([]);
     const [formData, setFormData] = useState({
         nombre: '',
         cantidad: 0,
-        categoria: 'CP',
+        categoria: '',
         fecha_elaboracion: new Date().toISOString().split('T')[0],
         peso_gramos: 0
     });
+
+    useEffect(() => {
+        api.get('/categorias/')
+            .then(res => {
+                setCategorias(res.data);
+                if (res.data.length > 0) {
+                    setFormData(prev => ({
+                        ...prev,
+                        categoria: res.data[0].id
+                    }));
+                }
+            })
+            .catch(err => console.error("Error al cargar categorías:", err));
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -48,11 +62,12 @@ const FormularioJabon = ({ onJabonAgregado, alCerrar }) => {
                     <label style={labelStyle}>Categoría:</label>
                     <select 
                         value={formData.categoria} 
-                        onChange={e => setFormData({...formData, categoria: e.target.value})}
+                        onChange={e => setFormData({...formData, categoria: parseInt(e.target.value) || ''})}
                         style={inputStyle}
                     >
-                        <option value="CP">Cuidado Personal</option>
-                        <option value="LAV">Lavandería</option>
+                        {categorias.map(cat => (
+                            <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+                        ))}
                     </select>
                 </div>
 
@@ -67,7 +82,7 @@ const FormularioJabon = ({ onJabonAgregado, alCerrar }) => {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                    <label style={labelStyle}>Peso Unitario (gramos):</label>
+                    <label style={labelStyle}>Peso Unitario ({config ? config.unidad_peso : 'gramos'}):</label>
                     <input 
                         type="number" 
                         placeholder="Ejem: 100" 
