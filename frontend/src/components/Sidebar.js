@@ -128,8 +128,8 @@ const Sidebar = () => {
       <div style={headerStyle}>
         {isOpen && (
           <div style={profileStyle}>
-            <p style={{ margin: 0, fontWeight: 'bold', fontSize: '16px', color: '#ffffff' }}>Benys</p>
-            <span style={{ fontSize: '12px', color: '#9ca3af' }}>Arquitecto de Stock</span>
+            <p style={{ margin: 0, fontWeight: 'bold', fontSize: '16px', color: '#ffffff' }}>SoapManager</p>
+            <span style={{ fontSize: '12px', color: '#9ca3af' }}>Calidad y Eficiencia</span>
           </div>
         )}
         <button 

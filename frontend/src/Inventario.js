@@ -33,7 +33,7 @@ const Inventario = () => {
 
     return (
         <div style={{ padding: '20px' }}>
-            <h1>Gestión de Inventario - Benys</h1>
+            <h1>Gestión de Inventario</h1>
 
             {/* Selector de Tabla (Tabs) */}
             <div style={{ marginBottom: '20px', borderBottom: '2px solid #ccc' }}>
