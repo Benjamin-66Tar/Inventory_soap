@@ -28,7 +28,8 @@ const TablaJabones = ({ datos = [], onAbrirFormulario, config }) => {
                         codigo: `Lote P-${p.id}`,
                         tipo: p.tipo.toLowerCase() === 'estandar' ? 'estandar' : 'experimento',
                         cantidad: p.unidades_resultantes,
-                        nota: p.notas
+                        nota: p.notas,
+                        enCurado: p.en_curado
                     }));
                     setLotes(mapped);
                 })
