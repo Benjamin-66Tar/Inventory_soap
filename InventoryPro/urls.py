@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include, re_path
 from rest_framework.routers import DefaultRouter
-from inventory.views import InsumoViewSet, JabonViewSet, ConsumoInsumoViewSet, SalidaJabonViewSet, ProduccionViewSet, CategoriaViewSet, ConfiguracionSistemaView
+from inventory.views import InsumoViewSet, JabonViewSet, ConsumoInsumoViewSet, SalidaJabonViewSet, ProduccionViewSet, CategoriaViewSet, ConfiguracionSistemaView, RecetaViewSet
 from django.views.generic import TemplateView
 from django.views.static import serve
 from django.conf import settings
@@ -14,6 +14,7 @@ router.register(r'consumos', ConsumoInsumoViewSet)
 router.register(r'salidas', SalidaJabonViewSet)
 router.register(r'produccion', ProduccionViewSet)
 router.register(r'categorias', CategoriaViewSet)
+router.register(r'recetas', RecetaViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),

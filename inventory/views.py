@@ -1,13 +1,24 @@
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
-from .models import Insumos, Jabon, ConsumoInsumo, SalidaJabon, Produccion, Categoria, ConfiguracionSistema
-from .serializers import InsumoSerializer, JabonSerializer, ConsumoInsumoSerializer, SalidaJabonSerializer, ProduccionSerializer, CategoriaSerializer, ConfiguracionSistemaSerializer
+from .models import Insumos, Jabon, ConsumoInsumo, SalidaJabon, Produccion, Categoria, ConfiguracionSistema, Receta, RecetaInsumo
+from .serializers import InsumoSerializer, JabonSerializer, ConsumoInsumoSerializer, SalidaJabonSerializer, ProduccionSerializer, CategoriaSerializer, ConfiguracionSistemaSerializer, RecetaSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 class CategoriaViewSet(viewsets.ModelViewSet):
     queryset = Categoria.objects.all()
     serializer_class = CategoriaSerializer
+
+class RecetaViewSet(viewsets.ModelViewSet):
+    queryset = Receta.objects.all()
+    serializer_class = RecetaSerializer
+
+    def get_queryset(self):
+        queryset = Receta.objects.all()
+        jabon_id = self.request.query_params.get('jabon', None)
+        if jabon_id is not None:
+            queryset = queryset.filter(jabon_id=jabon_id)
+        return queryset
 
 class ConfiguracionSistemaView(APIView):
     def get(self, request):

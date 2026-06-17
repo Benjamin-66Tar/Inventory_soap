@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Insumos, Jabon, ConsumoInsumo, SalidaJabon, DetalleProduccionInsumo, Produccion, Categoria, ConfiguracionSistema
+from .models import Insumos, Jabon, ConsumoInsumo, SalidaJabon, DetalleProduccionInsumo, Produccion, Categoria, ConfiguracionSistema, Receta, RecetaInsumo
 from django.db import transaction
 from  .services import ProduccionService
 
@@ -24,6 +24,41 @@ class ConfiguracionSistemaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ConfiguracionSistema
         fields = ['unidad_peso', 'dias_curado_defecto', 'umbral_critico_stock']
+
+class RecetaInsumoSerializer(serializers.ModelSerializer):
+    insumo_nombre = serializers.ReadOnlyField(source='insumo.nombre')
+
+    class Meta:
+        model = RecetaInsumo
+        fields = ['id', 'insumo', 'insumo_nombre', 'cantidad_base']
+
+class RecetaSerializer(serializers.ModelSerializer):
+    ingredientes = RecetaInsumoSerializer(many=True)
+    jabon_nombre = serializers.ReadOnlyField(source='jabon.nombre')
+
+    class Meta:
+        model = Receta
+        fields = ['id', 'jabon', 'jabon_nombre', 'cantidad_piezas_base', 'ingredientes']
+
+    def create(self, validated_data):
+        ingredientes_data = validated_data.pop('ingredientes')
+        receta = Receta.objects.create(**validated_data)
+        for ing in ingredientes_data:
+            RecetaInsumo.objects.create(receta=receta, **ing)
+        return receta
+
+    def update(self, instance, validated_data):
+        ingredientes_data = validated_data.pop('ingredientes', None)
+        instance.cantidad_piezas_base = validated_data.get('cantidad_piezas_base', instance.cantidad_piezas_base)
+        instance.jabon = validated_data.get('jabon', instance.jabon)
+        instance.save()
+
+        if ingredientes_data is not None:
+            # Delete old ingredients and recreate
+            instance.ingredientes.all().delete()
+            for ing in ingredientes_data:
+                RecetaInsumo.objects.create(receta=instance, **ing)
+        return instance
 
 class JabonSerializer(serializers.ModelSerializer):
     categoria_nombre = serializers.ReadOnlyField(source='categoria.nombre')

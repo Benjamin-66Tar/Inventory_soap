@@ -82,16 +82,35 @@ class SalidaJabon(models.Model):
         return f"{self.jabon.nombre} - {self.get_motivo_salida_display()}"
 
 
-# inventory/models.py
-
 class Receta(models.Model):
-    nombre = models.CharField(max_length=100)
-    descripcion = models.TextField(blank=True)
-
-    # Relación con insumos base para precargar (opcional)
+    jabon = models.OneToOneField(
+        'Jabon',
+        on_delete=models.CASCADE,
+        related_name='receta',
+        null=True,
+        blank=True
+    )
+    cantidad_piezas_base = models.IntegerField(default=10)
 
     def __str__(self):
-        return self.nombre
+        jabon_nombre = self.jabon.nombre if self.jabon else "Desconocido"
+        return f"Receta de {jabon_nombre} ({self.cantidad_piezas_base} piezas)"
+
+
+class RecetaInsumo(models.Model):
+    receta = models.ForeignKey(
+        Receta,
+        on_delete=models.CASCADE,
+        related_name='ingredientes'
+    )
+    insumo = models.ForeignKey(
+        'Insumos',
+        on_delete=models.CASCADE
+    )
+    cantidad_base = models.FloatField()
+
+    def __str__(self):
+        return f"{self.cantidad_base}g de {self.insumo.nombre} para {self.receta}"
 
 
 class Produccion(models.Model):
