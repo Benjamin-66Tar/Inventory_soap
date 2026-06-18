@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Inventario from './Inventario'; // Importamos tu nuevo componente
 import Layout from './components/Layout';
 import Produccion from './Produccion';
-import HistorialProduccion from './HistorialProduccion';
+import HistorialProduccion from './Historial/HistorialProduccion';
 import Curado from './Curado';
 import ConfiguracionPanel from './ConfiguracionPanel';
 
