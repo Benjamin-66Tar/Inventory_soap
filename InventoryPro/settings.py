@@ -19,15 +19,17 @@ DEBUG = os.getenv("DEBUG", "True") == "True"
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 # --- APPS ---
-INSTALLED_APPS = [
+INSTALLED_APPS = [ #En esta parte le dice a Django que módulos, herramientas o aplicaciones estan activas y cuales se deben integrar ene el proyecto
+    # Estas vienen preconfiguradas
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "corsheaders",
-    "inventory.apps.InventoryConfig",
+    # Aqui son aplicaciones de terceros
+    "corsheaders", # permite que el backend se comunique con el HTTPS
+    "inventory.apps.InventoryConfig", # Crea una API REST
     "rest_framework",
 ]
 
