@@ -65,10 +65,28 @@ const Curado = () => {
                     return (
                         <div key={lote.id} style={cardStyle(diasRestantes)}>
                             <h3 style={{ marginTop: 0 }}>{lote.jabon_nombre}</h3>
-                            <p style={{ margin: '5px 0' }}>Tipo: <strong>{lote.tipo}</strong></p>
+                            <p style={{ margin: '5px 0', fontSize: '14px' }}>Tipo: <strong>{lote.tipo}</strong></p>
+
+                            {/* Sección de Detalles */}
+                            <div style={{ 
+                                margin: '12px 0', 
+                                padding: '10px', 
+                                backgroundColor: '#f8f9fa', 
+                                borderRadius: '8px', 
+                                fontSize: '13px',
+                                borderLeft: '3px solid #007bff',
+                                textAlign: 'left'
+                            }}>
+                                <strong style={{ display: 'block', marginBottom: '5px', color: '#495057' }}>Detalles:</strong>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                                    <span>• N° Lote: <strong>P-{lote.id}</strong></span>
+                                    <span>• Cantidad: <strong>{lote.unidades_resultantes} pzs</strong></span>
+                                    <span>• Categoría: <strong>{lote.jabon_categoria_nombre || 'Sin Categoría'}</strong></span>
+                                </div>
+                            </div>
 
                             <div style={{ margin: '15px 0' }}>
-                                <p style={{ fontWeight: 'bold', color: diasRestantes <= 0 ? '#28a745' : '#333' }}>
+                                <p style={{ fontWeight: 'bold', color: diasRestantes <= 0 ? '#28a745' : '#333', margin: '0 0 5px 0' }}>
                                     {diasRestantes > 0 ? `Faltan ${diasRestantes} días` : '¡Listo para inventario!'}
                                 </p>
                                 <progress
@@ -76,6 +94,19 @@ const Curado = () => {
                                     max="100"
                                     style={{ width: '100%', height: '12px' }}
                                 />
+                                
+                                {/* Fechas de Elaboración y Finalización */}
+                                <div style={{ 
+                                    display: 'flex', 
+                                    justifyContent: 'space-between', 
+                                    fontSize: '11px', 
+                                    color: '#6c757d', 
+                                    marginTop: '8px',
+                                    textAlign: 'left'
+                                }}>
+                                    <span>📅 Elab: <strong>{new Date(lote.fecha_elaboracion).toLocaleDateString()}</strong></span>
+                                    <span>🏁 Fin: <strong>{new Date(lote.fecha_termino_curado).toLocaleDateString()}</strong></span>
+                                </div>
                             </div>
 
                             <button

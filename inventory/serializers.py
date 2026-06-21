@@ -105,6 +105,7 @@ class DetalleProduccionSerializer(serializers.ModelSerializer):
 
 class ProduccionSerializer(serializers.ModelSerializer):
     jabon_nombre = serializers.ReadOnlyField(source='jabon_producido.nombre')
+    jabon_categoria_nombre = serializers.ReadOnlyField(source='jabon_producido.categoria.nombre')
     detalles_insumos = DetalleProduccionSerializer(many=True, required=False)
 
     tiempo_curado = serializers.IntegerField(write_only=True, required=False, allow_null=True)
@@ -112,7 +113,12 @@ class ProduccionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Produccion
-        fields = '__all__'
+        fields = [
+            'id', 'tipo', 'receta', 'jabon_producido', 'jabon_nombre', 'jabon_categoria_nombre',
+            'fecha_elaboracion', 'unidades_resultantes', 'temperatura_mezcla', 'notas',
+            'costo_total', 'en_curado', 'fecha_termino_curado', 'completada', 'detalles_insumos',
+            'tiempo_curado', 'unidad_tiempo'
+        ]
 
     def create(self, validated_data):
         # Extraemos los detalles para enviarlos al servicio por separado

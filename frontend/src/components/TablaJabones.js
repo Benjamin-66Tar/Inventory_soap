@@ -110,7 +110,7 @@ const TablaJabones = ({ datos = [], onAbrirFormulario, config }) => {
                                     }}
                                     title="Toca para ver desglose de stock"
                                 >
-                                    {j.cantidad} pzs
+                                    {j.cantidad} piezas
                                 </td>
                                 <td>{j.categoria_nombre || 'Sin Categoría'}</td>
                                 <td>{j.peso_gramos}{config ? config.unidad_peso : 'g'}</td>
