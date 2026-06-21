@@ -76,6 +76,7 @@ class SalidaJabon(models.Model):
         choices=MotivoSalida.choices,
         default=MotivoSalida.VENTA
     )
+    notas = models.TextField(blank=True, default='')
     fecha_salida = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

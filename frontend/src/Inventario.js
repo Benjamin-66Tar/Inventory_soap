@@ -46,6 +46,26 @@ const Inventario = () => {
         }
     };
 
+    const handleRegistrarSalida = async (jabonId, cantidad, motivo, notas) => {
+        try {
+            await api.post('/salidas/', {
+                jabon: parseInt(jabonId),
+                cantidad_salida: parseInt(cantidad),
+                motivo_salida: motivo,
+                notas: notas
+            });
+            // Recargar datos
+            const resJabones = await api.get('/jabones/');
+            setJabones(resJabones.data);
+            const resInsumos = await api.get('/insumos/');
+            setInsumos(resInsumos.data);
+        } catch (err) {
+            console.error("Error al registrar salida de jabón:", err);
+            alert("Error al registrar la salida de inventario.");
+            throw err;
+        }
+    };
+
     useEffect(() => {
         // Carga centralizada de datos para mantener la sincronización
         api.get('/insumos/').then(res => setInsumos(res.data));
@@ -79,6 +99,7 @@ const Inventario = () => {
                 <TablaJabones
                     datos={jabones}
                     onAbrirFormulario={() => setShowModal(true)}
+                    onRegistrarSalida={handleRegistrarSalida}
                     config={config}
                 />
             ) : (

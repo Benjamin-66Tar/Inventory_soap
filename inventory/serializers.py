@@ -97,10 +97,11 @@ class ConsumoInsumoSerializer(serializers.ModelSerializer):
 class SalidaJabonSerializer(serializers.ModelSerializer):
     # Esto permite ver el nombre del motivo en lugar del código (ej: 'Venta' en lugar de 'VENTA')
     motivo_display = serializers.CharField(source='get_motivo_salida_display', read_only=True)
+    jabon_nombre = serializers.ReadOnlyField(source='jabon.nombre')
 
     class Meta:
         model = SalidaJabon
-        fields = ['id', 'jabon', 'cantidad_salida', 'motivo_salida', 'motivo_display', 'fecha_salida']
+        fields = ['id', 'jabon', 'jabon_nombre', 'cantidad_salida', 'motivo_salida', 'motivo_display', 'notas', 'fecha_salida']
 
 
 class DetalleProduccionSerializer(serializers.ModelSerializer):
