@@ -24,6 +24,28 @@ const Inventario = () => {
         setInsumos([...insumos, nuevoInsumo]);
     };
 
+    const handleReabastecerInsumo = async (insumoId, cantidadAdicional, proveedor, fechaIngreso) => {
+        const insumoObj = insumos.find(i => i.id === insumoId);
+        if (!insumoObj) return;
+
+        const nuevaCantidad = parseFloat(insumoObj.cantidad_gramos) + parseFloat(cantidadAdicional);
+
+        try {
+            await api.patch(`/insumos/${insumoId}/`, {
+                cantidad_gramos: nuevaCantidad,
+                proveedor: proveedor,
+                fecha_ingreso: fechaIngreso
+            });
+            // Recargar datos
+            const res = await api.get('/insumos/');
+            setInsumos(res.data);
+        } catch (err) {
+            console.error("Error al reabastecer insumo:", err);
+            alert("Error al reabastecer el insumo.");
+            throw err; // Relanzar para que el modal sepa que falló
+        }
+    };
+
     useEffect(() => {
         // Carga centralizada de datos para mantener la sincronización
         api.get('/insumos/').then(res => setInsumos(res.data));
@@ -63,6 +85,7 @@ const Inventario = () => {
                 <TablaInsumos 
                     datos={insumos}
                     onAbrirFormulario={() => setShowModalInsumo(true)}
+                    onReabastecer={handleReabastecerInsumo}
                     config={config}
                 />
             )}
@@ -76,11 +99,11 @@ const Inventario = () => {
                 />
             )}
 
-            {/* CORRECCIÓN 2: Renderizar el formulario de insumos cuando el estado sea true */}
             {showModalInsumo && (
                 <FormularioInsumo
                     onInsumoAgregado={agregarNuevoInsumo}
                     alCerrar={() => setShowModalInsumo(false)}
+                    insumos={insumos}
                 />
             )}
 

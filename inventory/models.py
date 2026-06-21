@@ -3,7 +3,7 @@ from django.core.validators import MinValueValidator
 
 class Insumos(models.Model):
     #Son detalle de los ingredientes del jabón
-    nombre = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=100, unique=True)
     cantidad_gramos = models.FloatField(validators=[MinValueValidator(0.0)])
     proveedor = models.CharField(max_length=100)
     fecha_ingreso = models.DateField()

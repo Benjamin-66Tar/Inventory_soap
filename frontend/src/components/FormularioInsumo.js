@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import api from '../api/api';
 
-const FormularioInsumo = ({ onInsumoAgregado, alCerrar }) => {
+const FormularioInsumo = ({ onInsumoAgregado, alCerrar, insumos = [] }) => {
     const [formData, setFormData] = useState({
         nombre: '',
         cantidad_gramos: 0,
@@ -12,6 +12,13 @@ const FormularioInsumo = ({ onInsumoAgregado, alCerrar }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const nombreNormalizado = formData.nombre.trim().toLowerCase();
+        const existe = insumos.some(ins => ins.nombre.trim().toLowerCase() === nombreNormalizado);
+        if (existe) {
+            alert("⚠️ Ya existe una materia prima registrada con este nombre.\n\nSi deseas agregar más stock, por favor utiliza la opción 'Reabastecer' en la tabla de materias primas.");
+            return;
+        }
+
         try {
             // Asegúrate de que la URL coincida con tu endpoint de Django para insumos
             const res = await api.post('/insumos/', formData);
@@ -19,7 +26,12 @@ const FormularioInsumo = ({ onInsumoAgregado, alCerrar }) => {
             alCerrar();
         } catch (error) {
             console.error("Error al registrar el insumo", error);
-            alert("Error al guardar el insumo. Revisa la consola.");
+            const errors = error.response?.data;
+            if (errors && (errors.nombre || JSON.stringify(errors).includes("unique"))) {
+                alert("⚠️ Ya existe una materia prima registrada con este nombre.\n\nSi deseas agregar más stock, por favor utiliza la opción 'Reabastecer' en la tabla de materias primas.");
+            } else {
+                alert("Error al guardar el insumo. Revisa la consola.");
+            }
         }
     };
 

@@ -9,6 +9,15 @@ class InsumoSerializer(serializers.ModelSerializer):
         #Aquí defines que datos quieres enviar a react
         fields = ['id', 'nombre', 'cantidad_gramos', 'proveedor', 'fecha_ingreso']
 
+    def validate_nombre(self, value):
+        nombre_limpio = value.strip()
+        qs = Insumos.objects.filter(nombre__iexact=nombre_limpio)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError("Ya existe una materia prima registrada con este nombre.")
+        return value
+
     def validate_cantidad_gramos(self, value):
         #Es un validador en el caso de un productos se este ponga negativo
         if value < 0:
