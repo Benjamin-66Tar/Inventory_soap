@@ -103,6 +103,16 @@ class SalidaJabonSerializer(serializers.ModelSerializer):
         model = SalidaJabon
         fields = ['id', 'jabon', 'jabon_nombre', 'cantidad_salida', 'motivo_salida', 'motivo_display', 'notas', 'fecha_salida']
 
+    def validate(self, attrs):
+        jabon = attrs.get('jabon')
+        cantidad_salida = attrs.get('cantidad_salida')
+        if jabon and cantidad_salida:
+            if cantidad_salida > jabon.cantidad:
+                raise serializers.ValidationError({
+                    'cantidad_salida': f"No puedes registrar una salida mayor al stock disponible para usar ({jabon.cantidad} pzs)."
+                })
+        return attrs
+
 
 class DetalleProduccionSerializer(serializers.ModelSerializer):
     class Meta:

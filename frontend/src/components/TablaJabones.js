@@ -56,8 +56,9 @@ const TablaJabones = ({ datos = [], onAbrirFormulario, onRegistrarSalida, config
     }, [datos, searchTerm, categoryFilter]);
 
     const abrirModalSalida = (jabon) => {
-        if (jabon.cantidad <= 0) {
-            alert("No hay piezas en stock disponibles para retirar.");
+        const disponibles = jabon.cantidad_lista !== undefined ? jabon.cantidad_lista : jabon.cantidad;
+        if (disponibles <= 0) {
+            alert("No hay jabones disponibles para usar para dar salida.");
             return;
         }
         setJabonSeleccionadoParaSalida(jabon);
@@ -70,12 +71,16 @@ const TablaJabones = ({ datos = [], onAbrirFormulario, onRegistrarSalida, config
     const manejarSalidaSubmit = async (e) => {
         e.preventDefault();
         const cant = parseInt(cantidadSalida);
+        const disponibles = jabonSeleccionadoParaSalida.cantidad_lista !== undefined 
+            ? jabonSeleccionadoParaSalida.cantidad_lista 
+            : jabonSeleccionadoParaSalida.cantidad;
+
         if (isNaN(cant) || cant <= 0) {
             alert("Por favor ingresa una cantidad válida mayor a 0.");
             return;
         }
-        if (cant > jabonSeleccionadoParaSalida.cantidad) {
-            alert(`No puedes dar salida a más piezas de las que hay en stock (Máximo ${jabonSeleccionadoParaSalida.cantidad} pzs).`);
+        if (cant > disponibles) {
+            alert(`No puedes dar salida a más piezas de las que están disponibles para usar (Máximo ${disponibles} pzs).`);
             return;
         }
 
@@ -224,6 +229,7 @@ const TablaJabones = ({ datos = [], onAbrirFormulario, onRegistrarSalida, config
                 onClose={() => setSelectedJabon(null)}
                 jabonNombre={selectedJabon ? selectedJabon.nombre : ''}
                 lotes={lotes}
+                cantidadLista={selectedJabon ? (selectedJabon.cantidad_lista !== undefined ? selectedJabon.cantidad_lista : selectedJabon.cantidad) : 0}
             />
 
             {/* Modal para Registrar Salida */}
@@ -232,7 +238,7 @@ const TablaJabones = ({ datos = [], onAbrirFormulario, onRegistrarSalida, config
                     <div style={modalContentStyle}>
                         <h3 style={{ margin: '0 0 10px 0', color: '#e67e22' }}>Dar Salida de Inventario</h3>
                         <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: '#666' }}>
-                            Retirar piezas de: <strong>{jabonSeleccionadoParaSalida.nombre}</strong> (Stock: {jabonSeleccionadoParaSalida.cantidad} pzs)
+                            Retirar piezas de: <strong>{jabonSeleccionadoParaSalida.nombre}</strong> (Disponibles para usar: {jabonSeleccionadoParaSalida.cantidad_lista !== undefined ? jabonSeleccionadoParaSalida.cantidad_lista : jabonSeleccionadoParaSalida.cantidad} pzs)
                         </p>
                         <form onSubmit={manejarSalidaSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
@@ -240,8 +246,8 @@ const TablaJabones = ({ datos = [], onAbrirFormulario, onRegistrarSalida, config
                                 <input
                                     type="number"
                                     min="1"
-                                    max={jabonSeleccionadoParaSalida.cantidad}
-                                    placeholder={`Máx: ${jabonSeleccionadoParaSalida.cantidad}`}
+                                    max={jabonSeleccionadoParaSalida.cantidad_lista !== undefined ? jabonSeleccionadoParaSalida.cantidad_lista : jabonSeleccionadoParaSalida.cantidad}
+                                    placeholder={`Máx: ${jabonSeleccionadoParaSalida.cantidad_lista !== undefined ? jabonSeleccionadoParaSalida.cantidad_lista : jabonSeleccionadoParaSalida.cantidad}`}
                                     value={cantidadSalida}
                                     onChange={e => setCantidadSalida(e.target.value)}
                                     style={inputStyle}
