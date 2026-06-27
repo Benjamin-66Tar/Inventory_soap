@@ -2,8 +2,10 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/api';
 import ModalDesgloseStock from './ModalDesgloseStock';
+import { useAuth } from '../context/AuthContext';
 
 const TablaJabones = ({ datos = [], onAbrirFormulario, onRegistrarSalida, config }) => {
+    const { role } = useAuth();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('');
@@ -98,12 +100,14 @@ const TablaJabones = ({ datos = [], onAbrirFormulario, onRegistrarSalida, config
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                 <h2 style={{ margin: 0, color: '#333' }}>Productos Terminados</h2>
-                <button
-                    onClick={onAbrirFormulario}
-                    style={{ backgroundColor: '#007bff', color: 'white', padding: '10px 20px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 2px 5px rgba(0, 123, 255, 0.2)' }}
-                >
-                    + Nuevo Jabón
-                </button>
+                {role !== 'OPERADOR' && (
+                    <button
+                        onClick={onAbrirFormulario}
+                        style={{ backgroundColor: '#007bff', color: 'white', padding: '10px 20px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 2px 5px rgba(0, 123, 255, 0.2)' }}
+                    >
+                        + Nuevo Jabón
+                    </button>
+                )}
             </div>
 
             {/* Controles de búsqueda y filtrado */}
@@ -135,7 +139,7 @@ const TablaJabones = ({ datos = [], onAbrirFormulario, onRegistrarSalida, config
                         <th style={{ padding: '12px' }}>Categoría</th>
                         <th style={{ padding: '12px' }}>Peso Unitario</th>
                         <th style={{ padding: '12px' }}>Estado</th>
-                        <th style={{ padding: '12px', textAlign: 'center' }}>Acciones</th>
+                        {role !== 'OPERADOR' && <th style={{ padding: '12px', textAlign: 'center' }}>Acciones</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -174,44 +178,46 @@ const TablaJabones = ({ datos = [], onAbrirFormulario, onRegistrarSalida, config
                                             </span>
                                         )}
                                     </td>
-                                    <td style={{ padding: '12px', textAlign: 'center' }}>
-                                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                                            <button
-                                                onClick={() => navigate('/produccion', { state: { preselectedJabonId: j.id } })}
-                                                style={{
-                                                    backgroundColor: '#28a745',
-                                                    color: 'white',
-                                                    border: 'none',
-                                                    padding: '6px 12px',
-                                                    borderRadius: '4px',
-                                                    cursor: 'pointer',
-                                                    fontSize: '13px',
-                                                    fontWeight: 'bold',
-                                                    boxShadow: '0 2px 4px rgba(40,167,69,0.15)',
-                                                    transition: 'background-color 0.2s'
-                                                }}
-                                            >
-                                                Fabricar 🛠️
-                                            </button>
-                                            <button
-                                                onClick={() => abrirModalSalida(j)}
-                                                style={{
-                                                    backgroundColor: '#e67e22',
-                                                    color: 'white',
-                                                    border: 'none',
-                                                    padding: '6px 12px',
-                                                    borderRadius: '4px',
-                                                    cursor: 'pointer',
-                                                    fontSize: '13px',
-                                                    fontWeight: 'bold',
-                                                    boxShadow: '0 2px 4px rgba(230,126,34,0.15)',
-                                                    transition: 'background-color 0.2s'
-                                                }}
-                                            >
-                                                Dar Salida 📤
-                                            </button>
-                                        </div>
-                                    </td>
+                                    {role !== 'OPERADOR' && (
+                                        <td style={{ padding: '12px', textAlign: 'center' }}>
+                                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                                                <button
+                                                    onClick={() => navigate('/produccion', { state: { preselectedJabonId: j.id } })}
+                                                    style={{
+                                                        backgroundColor: '#28a745',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        padding: '6px 12px',
+                                                        borderRadius: '4px',
+                                                        cursor: 'pointer',
+                                                        fontSize: '13px',
+                                                        fontWeight: 'bold',
+                                                        boxShadow: '0 2px 4px rgba(40,167,69,0.15)',
+                                                        transition: 'background-color 0.2s'
+                                                    }}
+                                                >
+                                                    Fabricar 🛠️
+                                                </button>
+                                                <button
+                                                    onClick={() => abrirModalSalida(j)}
+                                                    style={{
+                                                        backgroundColor: '#e67e22',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        padding: '6px 12px',
+                                                        borderRadius: '4px',
+                                                        cursor: 'pointer',
+                                                        fontSize: '13px',
+                                                        fontWeight: 'bold',
+                                                        boxShadow: '0 2px 4px rgba(230,126,34,0.15)',
+                                                        transition: 'background-color 0.2s'
+                                                    }}
+                                                >
+                                                    Dar Salida 📤
+                                                </button>
+                                            </div>
+                                        </td>
+                                    )}
                                 </tr>
                             );
                         })

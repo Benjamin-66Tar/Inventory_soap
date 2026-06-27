@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { menuConfig } from './navigationConfig';
+import { useAuth } from '../context/AuthContext';
 
 const emojiMap = {
   Soap: '🧼',
@@ -9,7 +10,15 @@ const emojiMap = {
   History: '📜'
 };
 
+const roleLabels = {
+  ADMIN: 'Administrador',
+  SUPERVISOR: 'Supervisor',
+  OPERADOR: 'Operador'
+};
+
 const Sidebar = () => {
+  const { user, role, logout } = useAuth();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(true);
   const [hoveredPath, setHoveredPath] = useState(null);
   const [hoveredFooter, setHoveredFooter] = useState(null); // 'config' or 'logout'
@@ -128,8 +137,8 @@ const Sidebar = () => {
       <div style={headerStyle}>
         {isOpen && (
           <div style={profileStyle}>
-            <p style={{ margin: 0, fontWeight: 'bold', fontSize: '16px', color: '#ffffff' }}>SoapManager</p>
-            <span style={{ fontSize: '12px', color: '#9ca3af' }}>Calidad y Eficiencia</span>
+            <p style={{ margin: 0, fontWeight: 'bold', fontSize: '16px', color: '#ffffff' }}>{user?.username || 'SoapManager'}</p>
+            <span style={{ fontSize: '12px', color: '#9ca3af' }}>{roleLabels[role] || 'Operador'}</span>
           </div>
         )}
         <button 
@@ -144,17 +153,22 @@ const Sidebar = () => {
 
       {/* 2. Lista Vertical de Enlaces */}
       <nav style={navContainerStyle}>
-        {menuConfig.map((item) => {
-          const iconEmoji = emojiMap[item.icon] || '⚙️';
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              style={({ isActive }) => getLinkStyle(isActive, hoveredPath === item.path)}
-              onMouseEnter={() => setHoveredPath(item.path)}
-              onMouseLeave={() => setHoveredPath(null)}
-            >
-              <span style={{ fontSize: '18px', display: 'inline-block', minWidth: '24px', textAlign: 'center' }}>
+        {menuConfig
+          .filter(item => {
+            if (item.path === '/produccion' && role === 'OPERADOR') return false;
+            return true;
+          })
+          .map((item) => {
+            const iconEmoji = emojiMap[item.icon] || '⚙️';
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                style={({ isActive }) => getLinkStyle(isActive, hoveredPath === item.path)}
+                onMouseEnter={() => setHoveredPath(item.path)}
+                onMouseLeave={() => setHoveredPath(null)}
+              >
+                <span style={{ fontSize: '18px', display: 'inline-block', minWidth: '24px', textAlign: 'center' }}>
                 {iconEmoji}
               </span>
               {isOpen && <span>{item.label}</span>}
@@ -165,19 +179,25 @@ const Sidebar = () => {
 
       {/* 3. Footer del Sistema */}
       <div style={footerStyle}>
-        <NavLink 
-          to="/configuracion"
-          style={({ isActive }) => ({ ...getFooterBtnStyle(hoveredFooter === 'config' || isActive, false), textDecoration: 'none' })}
-          onMouseEnter={() => setHoveredFooter('config')}
-          onMouseLeave={() => setHoveredFooter(null)}
-        >
-          <span style={{ fontSize: '16px', minWidth: '24px', textAlign: 'center' }}>⚙️</span>
-          {isOpen && <span>Configuración</span>}
-        </NavLink>
+        {role === 'ADMIN' && (
+          <NavLink 
+            to="/configuracion"
+            style={({ isActive }) => ({ ...getFooterBtnStyle(hoveredFooter === 'config' || isActive, false), textDecoration: 'none' })}
+            onMouseEnter={() => setHoveredFooter('config')}
+            onMouseLeave={() => setHoveredFooter(null)}
+          >
+            <span style={{ fontSize: '16px', minWidth: '24px', textAlign: 'center' }}>⚙️</span>
+            {isOpen && <span>Configuración</span>}
+          </NavLink>
+        )}
         <button 
           style={getFooterBtnStyle(hoveredFooter === 'logout', true)}
           onMouseEnter={() => setHoveredFooter('logout')}
           onMouseLeave={() => setHoveredFooter(null)}
+          onClick={() => {
+            logout();
+            navigate('/login');
+          }}
         >
           <span style={{ fontSize: '16px', minWidth: '24px', textAlign: 'center' }}>🚪</span>
           {isOpen && <span>Cerrar Sesión</span>}

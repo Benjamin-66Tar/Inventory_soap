@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 const TablaInsumos = ({ datos = [], onAbrirFormulario, onReabastecer, config }) => {
+    const { role } = useAuth();
     const [searchTerm, setSearchTerm] = useState('');
     const [providerFilter, setProviderFilter] = useState('');
 
@@ -54,12 +56,14 @@ const TablaInsumos = ({ datos = [], onAbrirFormulario, onReabastecer, config }) 
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                 <h2 style={{ margin: 0, color: '#333' }}>Materia Prima (Insumos)</h2>
-                <button
-                    onClick={onAbrirFormulario}
-                    style={{ backgroundColor: '#28a745', color: 'white', padding: '10px 20px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 2px 5px rgba(40, 167, 69, 0.2)' }}
-                >
-                    + Nuevo Insumo
-                </button>
+                {role !== 'OPERADOR' && (
+                    <button
+                        onClick={onAbrirFormulario}
+                        style={{ backgroundColor: '#28a745', color: 'white', padding: '10px 20px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 2px 5px rgba(40, 167, 69, 0.2)' }}
+                    >
+                        + Nuevo Insumo
+                    </button>
+                )}
             </div>
 
             {/* Controles de búsqueda y filtrado */}
@@ -90,7 +94,7 @@ const TablaInsumos = ({ datos = [], onAbrirFormulario, onReabastecer, config }) 
                         <th style={{ padding: '12px' }}>Cantidad ({unitSuffix})</th>
                         <th style={{ padding: '12px' }}>Proveedor</th>
                         <th style={{ padding: '12px' }}>Fecha de Ingreso</th>
-                        <th style={{ padding: '12px', textAlign: 'center' }}>Acciones</th>
+                        {role !== 'OPERADOR' && <th style={{ padding: '12px', textAlign: 'center' }}>Acciones</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -113,14 +117,16 @@ const TablaInsumos = ({ datos = [], onAbrirFormulario, onReabastecer, config }) 
                                 </td>
                                 <td style={{ padding: '12px' }}>{i.proveedor}</td>
                                 <td style={{ padding: '12px' }}>{i.fecha_ingreso}</td>
-                                <td style={{ padding: '12px', textAlign: 'center' }}>
-                                    <button
-                                        onClick={() => abrirModalReabastecer(i)}
-                                        style={{ backgroundColor: '#007bff', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px', boxShadow: '0 2px 4px rgba(0,123,255,0.1)' }}
-                                    >
-                                        Reabastecer 📥
-                                    </button>
-                                </td>
+                                {role !== 'OPERADOR' && (
+                                    <td style={{ padding: '12px', textAlign: 'center' }}>
+                                        <button
+                                            onClick={() => abrirModalReabastecer(i)}
+                                            style={{ backgroundColor: '#007bff', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px', boxShadow: '0 2px 4px rgba(0,123,255,0.1)' }}
+                                        >
+                                            Reabastecer 📥
+                                        </button>
+                                    </td>
+                                )}
                             </tr>
                         ))
                     ) : (
