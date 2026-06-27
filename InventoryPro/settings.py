@@ -31,6 +31,7 @@ INSTALLED_APPS = [ #En esta parte le dice a Django que módulos, herramientas o 
     "corsheaders", # permite que el backend se comunique con el HTTPS
     "inventory.apps.InventoryConfig", # Crea una API REST
     "rest_framework",
+    "rest_framework.authtoken",
 ]
 
 # --- MIDDLEWARE (Obligatorio para que funcione el servidor) ---
@@ -58,8 +59,11 @@ DATABASES = {
 
 # --- REST FRAMEWORK ---
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
     ],
 }
 

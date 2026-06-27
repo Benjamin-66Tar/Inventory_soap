@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.contrib.auth.models import User
+import uuid
 
 class Insumos(models.Model):
     #Son detalle de los ingredientes del jabón
@@ -146,3 +148,64 @@ class DetalleProduccionInsumo(models.Model):
     lote_origen = models.CharField(max_length=50, help_text="ID del lote de materia prima")
     cantidad_utilizada = models.DecimalField(max_digits=10, decimal_places=2)
     costo_unitario_momento = models.DecimalField(max_digits=10, decimal_places=2)
+
+class RolUsuario(models.TextChoices):
+    ADMIN = 'ADMIN', 'Administrador'
+    SUPERVISOR = 'SUPERVISOR', 'Supervisor'
+    OPERADOR = 'OPERADOR', 'Operador'
+
+class PerfilUsuario(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
+    rol = models.CharField(
+        max_length=15,
+        choices=RolUsuario.choices,
+        default=RolUsuario.OPERADOR
+    )
+
+    def __str__(self):
+        return f"{self.user.username} ({self.get_rol_display()})"
+
+class Invitacion(models.Model):
+    email = models.EmailField(unique=True)
+    rol = models.CharField(
+        max_length=15,
+        choices=RolUsuario.choices,
+        default=RolUsuario.OPERADOR
+    )
+    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+    expires_at = models.DateTimeField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        from django.utils import timezone
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timezone.timedelta(hours=48)
+        super().save(*args, **kwargs)
+
+    @property
+    def is_expired(self):
+        from django.utils import timezone
+        return timezone.now() > self.expires_at
+
+    def __str__(self):
+        return f"Invitación para {self.email} ({self.rol})"
+
+class BitacoraActividades(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='logs')
+    accion = models.CharField(max_length=255)
+    detalles = models.TextField(blank=True, default='')
+    fecha_hora = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        user_str = self.usuario.username if self.usuario else "Sistema/Anónimo"
+        return f"{self.fecha_hora} - {user_str}: {self.accion}"
+
+class RecuperacionClave(models.Model):
+    email = models.EmailField()
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Código de recuperación para {self.email} ({self.code})"

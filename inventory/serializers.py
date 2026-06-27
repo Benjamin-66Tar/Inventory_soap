@@ -1,7 +1,8 @@
 from rest_framework import serializers
-from .models import Insumos, Jabon, ConsumoInsumo, SalidaJabon, DetalleProduccionInsumo, Produccion, Categoria, ConfiguracionSistema, Receta, RecetaInsumo
+from .models import Insumos, Jabon, ConsumoInsumo, SalidaJabon, DetalleProduccionInsumo, Produccion, Categoria, ConfiguracionSistema, Receta, RecetaInsumo, PerfilUsuario, Invitacion, BitacoraActividades
 from django.db import transaction
-from  .services import ProduccionService
+from .services import ProduccionService
+from django.contrib.auth.models import User
 
 class InsumoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -146,3 +147,37 @@ class ProduccionSerializer(serializers.ModelSerializer):
 
         # Llamada al Service Layer
         return ProduccionService.registrar_produccion(validated_data, detalles_data)
+
+class PerfilUsuarioSerializer(serializers.ModelSerializer):
+    rol_display = serializers.CharField(source='get_rol_display', read_only=True)
+    class Meta:
+        model = PerfilUsuario
+        fields = ['rol', 'rol_display']
+
+class UserSerializer(serializers.ModelSerializer):
+    rol = serializers.SerializerMethodField()
+    rol_display = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'rol', 'rol_display', 'is_active']
+
+    def get_rol(self, obj):
+        perfil = getattr(obj, 'perfil', None)
+        return perfil.rol if perfil else None
+
+    def get_rol_display(self, obj):
+        perfil = getattr(obj, 'perfil', None)
+        return perfil.get_rol_display() if perfil else None
+
+class BitacoraActividadesSerializer(serializers.ModelSerializer):
+    usuario_nombre = serializers.ReadOnlyField(source='usuario.username')
+    class Meta:
+        model = BitacoraActividades
+        fields = ['id', 'usuario', 'usuario_nombre', 'accion', 'detalles', 'fecha_hora']
+
+class InvitacionSerializer(serializers.ModelSerializer):
+    rol_display = serializers.CharField(source='get_rol_display', read_only=True)
+    class Meta:
+        model = Invitacion
+        fields = ['id', 'email', 'rol', 'rol_display', 'token', 'fecha_creacion', 'is_used', 'is_expired']
