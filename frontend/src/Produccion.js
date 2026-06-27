@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import api from './api/api';
 import FormularioJabon from './components/FormularioJabon';
+import { useAuth } from './context/AuthContext';
 
 const Produccion = () => {
+    const { role } = useAuth();
     const location = useLocation();
     const [activeTab, setActiveTab] = useState('nueva_produccion');
 
@@ -396,18 +398,22 @@ const Produccion = () => {
                 >
                     🧪 Nueva Producción
                 </button>
-                <button
-                    onClick={() => setActiveTab('recetas_oficiales')}
-                    style={tabButtonStyle(activeTab === 'recetas_oficiales')}
-                >
-                    📝 Recetas Oficiales
-                </button>
-                <button
-                    onClick={() => setActiveTab('categorias')}
-                    style={tabButtonStyle(activeTab === 'categorias')}
-                >
-                    🏷️ Categorías
-                </button>
+                {role === 'ADMIN' && (
+                    <>
+                        <button
+                            onClick={() => setActiveTab('recetas_oficiales')}
+                            style={tabButtonStyle(activeTab === 'recetas_oficiales')}
+                        >
+                            📝 Recetas Oficiales
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('categorias')}
+                            style={tabButtonStyle(activeTab === 'categorias')}
+                        >
+                            🏷️ Categorías
+                        </button>
+                    </>
+                )}
             </div>
 
             {/* CONTENIDO DE PESTAÑAS */}

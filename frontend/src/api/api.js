@@ -12,4 +12,18 @@ const api = axios.create({
     },
 });
 
+// Interceptor para inyectar token de autenticación en cada petición
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('soap_token');
+        if (token) {
+            config.headers['Authorization'] = `Token ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
 export default api;
