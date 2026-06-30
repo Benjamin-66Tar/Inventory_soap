@@ -46,6 +46,11 @@ const Produccion = () => {
     const [selectedCategoria, setSelectedCategoria] = useState(null);
     const [categoriaNombre, setCategoriaNombre] = useState('');
 
+    // --- ESTADOS PARA ELIMINACIÓN DE JABÓN ---
+    const [jabonAEliminar, setJabonAEliminar] = useState(null);
+    const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
+    const [errorEliminacion, setErrorEliminacion] = useState('');
+
     // --- CARGA INICIAL DE DATOS ---
     useEffect(() => {
         api.get('/insumos/')
@@ -279,6 +284,47 @@ const Produccion = () => {
         }
     };
 
+    // --- ACCIONES DE ELIMINACIÓN DE JABÓN (EXCLUSIVO ADMIN) ---
+    const iniciarEliminarJabon = (jabon) => {
+        setJabonAEliminar(jabon);
+        setErrorEliminacion('');
+        setShowConfirmDeleteModal(true);
+    };
+
+    const cancelarEliminacion = () => {
+        setJabonAEliminar(null);
+        setErrorEliminacion('');
+        setShowConfirmDeleteModal(false);
+    };
+
+    const ejecutarEliminarJabon = async () => {
+        if (!jabonAEliminar) return;
+        try {
+            await api.delete(`/jabones/${jabonAEliminar.id}/`);
+            
+            // Actualizar lista local de jabones
+            setJabones(prev => prev.filter(j => j.id !== jabonAEliminar.id));
+            
+            // Si el jabón seleccionado en el formulario de producción es el que borramos, limpiarlo
+            if (jabonSeleccionado === jabonAEliminar.id.toString()) {
+                setJabonSeleccionado('');
+            }
+            
+            // Recargar recetas ya que la receta del jabón se elimina en cascada
+            cargarRecetas();
+            
+            // Cerrar el modal y limpiar estados
+            setJabonAEliminar(null);
+            setShowConfirmDeleteModal(false);
+            setErrorEliminacion('');
+            alert("El jabón y todos sus registros asociados fueron eliminados con éxito.");
+        } catch (err) {
+            console.error("Error al eliminar jabón:", err);
+            const msg = err.response?.data?.detail || err.response?.data?.error || "Error al intentar eliminar el jabón desde el servidor.";
+            setErrorEliminacion(msg);
+        }
+    };
+
     // --- ACCIONES DE RECETAS ---
     const abrirNuevaReceta = () => {
         setSelectedReceta(null);
@@ -411,6 +457,12 @@ const Produccion = () => {
                             style={tabButtonStyle(activeTab === 'categorias')}
                         >
                             🏷️ Categorías
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('eliminar_jabon')}
+                            style={tabButtonStyle(activeTab === 'eliminar_jabon')}
+                        >
+                            🗑️ Eliminar Jabón
                         </button>
                     </>
                 )}
@@ -731,6 +783,52 @@ const Produccion = () => {
                 </div>
             )}
 
+            {/* PESTAÑA 4: ELIMINAR JABÓN (Exclusivo Administrador) */}
+            {activeTab === 'eliminar_jabon' && role === 'ADMIN' && (
+                <div>
+                    <div style={titleRowStyle}>
+                        <h3 style={{ margin: 0 }}>Catálogo de Jabones (Eliminación)</h3>
+                    </div>
+                    <p style={descriptionStyle}>
+                        Consulte los perfiles de jabones registrados. <strong>Nota:</strong> Al eliminar un tipo de jabón, se borrarán en cascada todos sus registros de producción, recetas y salidas de stock asociadas.
+                    </p>
+                    
+                    <table border="1" cellPadding="10" style={tableStyle}>
+                        <thead>
+                            <tr style={{ backgroundColor: '#f9fafb' }}>
+                                <th style={{ width: '40%', textAlign: 'left' }}>Nombre del Jabón</th>
+                                <th style={{ width: '25%', textAlign: 'left' }}>Categoría</th>
+                                <th style={{ width: '15%', textAlign: 'center' }}>Stock (Piezas)</th>
+                                <th style={{ width: '20%', textAlign: 'center' }}>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {jabones.length > 0 ? (
+                                jabones.map(j => (
+                                    <tr key={j.id}>
+                                        <td style={{ fontWeight: '500' }}>{j.nombre}</td>
+                                        <td>{j.categoria_nombre || 'Sin Categoría'}</td>
+                                        <td style={{ textAlign: 'center' }}>{j.cantidad}</td>
+                                        <td style={{ textAlign: 'center' }}>
+                                            <button 
+                                                onClick={() => iniciarEliminarJabon(j)} 
+                                                style={deleteBtnStyle}
+                                            >
+                                                Eliminar 🗑️
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="4" style={{ textAlign: 'center', color: '#999' }}>No hay jabones registrados en el catálogo.</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
             {/* --- MODALES Y DIÁLOGOS EMERGENTES --- */}
 
             {/* Quick Create Jabón Modal */}
@@ -920,6 +1018,60 @@ const Produccion = () => {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal de Confirmación para Eliminar Jabón */}
+            {showConfirmDeleteModal && jabonAEliminar && (
+                <div style={modalBackdropStyle}>
+                    <div style={{ ...modalContentStyle, width: '400px', borderLeft: '6px solid #dc3545' }}>
+                        <h3 style={{ margin: '0 0 15px 0', color: '#dc3545' }}>¿Confirmar Eliminación?</h3>
+                        <p style={{ fontSize: '14px', lineHeight: '1.5', margin: '0 0 15px 0', color: '#333' }}>
+                            ¿Está seguro de que desea eliminar por completo el jabón <strong>{jabonAEliminar.nombre}</strong>?
+                        </p>
+                        
+                        <div style={{ 
+                            backgroundColor: '#fff3cd', 
+                            color: '#856404', 
+                            border: '1px solid #ffeeba', 
+                            padding: '12px', 
+                            borderRadius: '6px', 
+                            fontSize: '12.5px', 
+                            marginBottom: '15px',
+                            lineHeight: '1.4'
+                        }}>
+                            ⚠️ <strong>Advertencia de Borrado en Cascada:</strong> Esta acción eliminará permanentemente:
+                            <ul style={{ margin: '5px 0 0 20px', padding: 0 }}>
+                                <li>El perfil del jabón en el catálogo.</li>
+                                <li>La receta estándar asociada (si existe).</li>
+                                <li>El historial de producciones de este jabón ({jabonAEliminar.cantidad_curando || 0} piezas en curado).</li>
+                                <li>Todos los registros de salidas y ventas ({jabonAEliminar.cantidad_lista || 0} piezas listas en stock).</li>
+                            </ul>
+                        </div>
+
+                        {errorEliminacion && (
+                            <div style={{ ...errorBannerStyle, marginBottom: '15px', fontSize: '13px' }}>
+                                {errorEliminacion}
+                            </div>
+                        )}
+
+                        <div style={modalButtonsStyle}>
+                            <button 
+                                type="button" 
+                                onClick={cancelarEliminacion} 
+                                style={{ ...cancelModalBtnStyle, backgroundColor: '#6c757d' }}
+                            >
+                                Cancelar
+                            </button>
+                            <button 
+                                type="button" 
+                                onClick={ejecutarEliminarJabon} 
+                                style={deleteBtnStyle}
+                            >
+                                Sí, eliminar jabón
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

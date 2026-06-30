@@ -557,9 +557,23 @@ class JabonViewSet(viewsets.ModelViewSet):
     serializer_class = JabonSerializer
     permission_classes = [EsOperadorOMas]
 
+    def get_permissions(self):
+        if self.action == 'destroy':
+            return [EsAdministrador()]
+        return super().get_permissions()
+
     def perform_create(self, serializer):
         jabon = serializer.save()
         registrar_bitacora(self.request.user, "Crear Perfil Jabón", f"Se registró un nuevo tipo de jabón en catálogo: {jabon.nombre}")
+
+    def perform_destroy(self, instance):
+        nombre = instance.nombre
+        instance.delete()
+        registrar_bitacora(
+            self.request.user, 
+            "Eliminar Jabón", 
+            f"Se eliminó por completo el tipo de jabón del catálogo: {nombre} y todos sus registros asociados."
+        )
 
 
 class ConsumoInsumoViewSet(viewsets.ModelViewSet):
