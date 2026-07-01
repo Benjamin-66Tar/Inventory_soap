@@ -689,7 +689,7 @@ const Produccion = () => {
                             }}
                             disabled={tipo === 'ESTANDAR' && !recetaActiva}
                         >
-                            Finalizar Producción y Descontar Stock
+                            Finalizar
                         </button>
                     </form>
                 </div>
