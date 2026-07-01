@@ -526,7 +526,7 @@ const ConfiguracionPanel = () => {
                                             bitacora.map(log => (
                                                 <tr key={log.id} style={tableRowStyle}>
                                                     <td style={{ ...tableCellStyle, fontSize: '13px', color: '#9ca3af' }}>{new Date(log.fecha_hora).toLocaleString()}</td>
-                                                    <td style={{ ...tableCellStyle, fontWeight: '600' }}>{log.usuario_username || 'Sistema'}</td>
+                                                    <td style={{ ...tableCellStyle, fontWeight: '600' }}>{log.usuario_nombre || 'Sistema'}</td>
                                                     <td style={tableCellStyle}>
                                                         <span style={badgeStyle('#a78bfa', 'rgba(167,139,250,0.15)')}>
                                                             {log.accion}

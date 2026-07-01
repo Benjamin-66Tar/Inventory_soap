@@ -171,10 +171,17 @@ class UserSerializer(serializers.ModelSerializer):
         return perfil.get_rol_display() if perfil else None
 
 class BitacoraActividadesSerializer(serializers.ModelSerializer):
-    usuario_nombre = serializers.ReadOnlyField(source='usuario.username')
+    usuario_nombre = serializers.SerializerMethodField()
+
     class Meta:
         model = BitacoraActividades
         fields = ['id', 'usuario', 'usuario_nombre', 'accion', 'detalles', 'fecha_hora']
+
+    def get_usuario_nombre(self, obj):
+        if obj.usuario:
+            full_name = f"{obj.usuario.first_name} {obj.usuario.last_name}".strip()
+            return full_name if full_name else obj.usuario.username
+        return "Sistema"
 
 class InvitacionSerializer(serializers.ModelSerializer):
     rol_display = serializers.CharField(source='get_rol_display', read_only=True)
