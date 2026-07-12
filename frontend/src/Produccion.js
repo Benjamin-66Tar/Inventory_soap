@@ -25,7 +25,7 @@ const Produccion = () => {
     const [errorReceta, setErrorReceta] = useState('');
 
     const [filasInsumos, setFilasInsumos] = useState([
-        { insumoId: '', cantidadReal: '', lote: '' }
+        { insumoId: '', cantidadReal: '' }
     ]);
     const [showQuickCreateJabon, setShowQuickCreateJabon] = useState(false);
 
@@ -168,7 +168,7 @@ const Produccion = () => {
 
     // --- ACCIONES DE PRODUCCIÓN (FORMULARIO ORIGINAL) ---
     const agregarFila = () => {
-        setFilasInsumos([...filasInsumos, { insumoId: '', cantidadReal: '', lote: '' }]);
+        setFilasInsumos([...filasInsumos, { insumoId: '', cantidadReal: '' }]);
     };
 
     const manejarCambioFila = (index, campo, valor) => {
@@ -202,7 +202,7 @@ const Produccion = () => {
             detalles_insumos: filasInsumos.map(f => ({
                 insumo: parseInt(f.insumoId),
                 cantidad_utilizada: parseFloat(f.cantidadReal),
-                lote_origen: f.lote || "N/A",
+                lote_origen: "N/A",
                 costo_unitario_momento: 0.0
             }))
         };
@@ -528,7 +528,6 @@ const Produccion = () => {
                                 <tr style={{ textAlign: 'left', borderBottom: '2px solid #eee', color: '#666', fontSize: '14px' }}>
                                     <th style={{ padding: '8px 0' }}>Insumo</th>
                                     <th style={{ padding: '8px 0' }}>Cantidad ({unitSuffix})</th>
-                                    <th style={{ padding: '8px 0' }}>Lote</th>
                                     {tipo === 'EXPERIMENTO' && <th style={{ padding: '8px 0', textAlign: 'center' }}>Acciones</th>}
                                 </tr>
                             </thead>
@@ -570,16 +569,6 @@ const Produccion = () => {
                                                     cursor: tipo === 'ESTANDAR' ? 'not-allowed' : 'text'
                                                 }}
                                                 disabled={tipo === 'ESTANDAR'}
-                                                required
-                                            />
-                                        </td>
-                                        <td style={{ padding: '6px 0' }}>
-                                            <input
-                                                type="text"
-                                                placeholder="Código Lote Insumo"
-                                                value={fila.lote}
-                                                onChange={e => manejarCambioFila(index, 'lote', e.target.value)}
-                                                style={{ ...inputStyle, width: '90%' }}
                                                 required
                                             />
                                         </td>
