@@ -383,8 +383,8 @@ class BackupRestoreView(APIView):
 
         # Formatear DecimalFields a float
         for row in data['producciones']:
-            if row['temperatura_mezcla']: row['temperatura_mezcla'] = float(row['temperatura_mezcla'])
-            if row['costo_total']: row['costo_total'] = float(row['costo_total'])
+            if row['temperatura_mezcla'] is not None: row['temperatura_mezcla'] = float(row['temperatura_mezcla'])
+            if row['costo_total'] is not None: row['costo_total'] = float(row['costo_total'])
 
         response = HttpResponse(json.dumps(data, indent=4), content_type='application/json')
         response['Content-Disposition'] = 'attachment; filename="respaldo_inventario_benys.json"'
