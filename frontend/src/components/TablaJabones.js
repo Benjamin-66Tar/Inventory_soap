@@ -4,7 +4,7 @@ import api from '../api/api';
 import ModalDesgloseStock from './ModalDesgloseStock';
 import { useAuth } from '../context/AuthContext';
 
-const TablaJabones = ({ datos = [], onAbrirFormulario, onRegistrarSalida, config }) => {
+const TablaJabones = ({ datos = [], onRegistrarSalida, config }) => {
     const { role } = useAuth();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
@@ -100,14 +100,6 @@ const TablaJabones = ({ datos = [], onAbrirFormulario, onRegistrarSalida, config
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                 <h2 style={{ margin: 0, color: '#333' }}>Productos Terminados</h2>
-                {role !== 'OPERADOR' && (
-                    <button
-                        onClick={onAbrirFormulario}
-                        style={{ backgroundColor: '#007bff', color: 'white', padding: '10px 20px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 2px 5px rgba(0, 123, 255, 0.2)' }}
-                    >
-                        + Nuevo Jabón
-                    </button>
-                )}
             </div>
 
             {/* Controles de búsqueda y filtrado */}

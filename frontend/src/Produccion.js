@@ -459,10 +459,10 @@ const Produccion = () => {
                             🏷️ Categorías
                         </button>
                         <button
-                            onClick={() => setActiveTab('eliminar_jabon')}
-                            style={tabButtonStyle(activeTab === 'eliminar_jabon')}
+                            onClick={() => setActiveTab('catalogo_jabones')}
+                            style={tabButtonStyle(activeTab === 'catalogo_jabones')}
                         >
-                            🗑️ Eliminar Jabón
+                            🧼 Catálogo de Jabones
                         </button>
                     </>
                 )}
@@ -783,14 +783,17 @@ const Produccion = () => {
                 </div>
             )}
 
-            {/* PESTAÑA 4: ELIMINAR JABÓN (Exclusivo Administrador) */}
-            {activeTab === 'eliminar_jabon' && role === 'ADMIN' && (
+            {/* PESTAÑA 4: CATÁLOGO DE JABONES (Exclusivo Administrador) */}
+            {activeTab === 'catalogo_jabones' && role === 'ADMIN' && (
                 <div>
                     <div style={titleRowStyle}>
-                        <h3 style={{ margin: 0 }}>Catálogo de Jabones (Eliminación)</h3>
+                        <h3 style={{ margin: 0 }}>Catálogo de Jabones</h3>
+                        <button onClick={() => setShowQuickCreateJabon(true)} style={addButtonStyle}>
+                            + Nuevo Jabón
+                        </button>
                     </div>
                     <p style={descriptionStyle}>
-                        Consulte los perfiles de jabones registrados. <strong>Nota:</strong> Al eliminar un tipo de jabón, se borrarán en cascada todos sus registros de producción, recetas y salidas de stock asociadas.
+                        Consulte y gestione los perfiles de jabones registrados. <strong>Nota:</strong> Al eliminar un tipo de jabón, se borrarán en cascada todos sus registros de producción, recetas y salidas de stock asociadas.
                     </p>
                     
                     <table border="1" cellPadding="10" style={tableStyle}>

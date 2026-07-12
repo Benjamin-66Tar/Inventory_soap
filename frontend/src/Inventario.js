@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import api from './api/api';
 import TablaInsumos from './components/TablaInsumos';
 import TablaJabones from './components/TablaJabones';
-import FormularioJabon from './components/FormularioJabon';
 import FormularioInsumo from './components/FormularioInsumo';
 
 const Inventario = () => {
@@ -11,14 +10,8 @@ const Inventario = () => {
     const [jabones, setJabones] = useState([]);
 
     // Estados para controlar la visibilidad de los modales
-    const [showModal, setShowModal] = useState(false);
     const [showModalInsumo, setShowModalInsumo] = useState(false);
     const [config, setConfig] = useState(null);
-
-    // Funciones para actualizar el estado local tras agregar un registro
-    const agregarNuevoJabon = (nuevoJabon) => {
-        setJabones([...jabones, nuevoJabon]);
-    };
 
     const agregarNuevoInsumo = (nuevoInsumo) => {
         setInsumos([...insumos, nuevoInsumo]);
@@ -98,7 +91,6 @@ const Inventario = () => {
             {view === 'jabones' ? (
                 <TablaJabones
                     datos={jabones}
-                    onAbrirFormulario={() => setShowModal(true)}
                     onRegistrarSalida={handleRegistrarSalida}
                     config={config}
                 />
@@ -111,14 +103,6 @@ const Inventario = () => {
                 />
             )}
             </div>
-
-            {showModal && (
-                <FormularioJabon
-                    onJabonAgregado={agregarNuevoJabon}
-                    alCerrar={() => setShowModal(false)}
-                    config={config}
-                />
-            )}
 
             {showModalInsumo && (
                 <FormularioInsumo
