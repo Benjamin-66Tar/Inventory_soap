@@ -316,6 +316,23 @@ class UsuariosViewSet(viewsets.ModelViewSet):
 
         return Response({'status': 'Rol actualizado correctamente.'})
 
+    @action(detail=True, methods=['post'], url_path='cambiar-password')
+    def cambiar_password(self, request, pk=None):
+        user = self.get_object()
+        password = request.data.get('password', '').strip()
+        
+        if not password:
+            return Response({'error': 'La contraseña no puede estar vacía.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if len(password) < 6:
+            return Response({'error': 'La contraseña debe tener al menos 6 caracteres.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(password)
+        user.save()
+
+        registrar_bitacora(request.user, "Gestión Usuario - Cambio Clave", f"Se restableció la contraseña del usuario {user.username}.")
+        return Response({'status': 'Contraseña actualizada correctamente.'})
+
     @action(detail=False, methods=['get'])
     def invitaciones_pendientes(self, request):
         invs = Invitacion.objects.filter(is_used=False, expires_at__gt=timezone.now()).order_by('-fecha_creacion')

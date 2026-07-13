@@ -23,6 +23,12 @@ const ConfiguracionPanel = () => {
     // Archivo de Respaldo
     const [backupFile, setBackupFile] = useState(null);
 
+    // Modal Cambio Contraseña
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
+    const [nuevaPassword, setNuevaPassword] = useState('');
+    const [errorPassword, setErrorPassword] = useState('');
+
     // Estados de carga y mensajes
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
@@ -143,6 +149,37 @@ const ConfiguracionPanel = () => {
         } catch (err) {
             console.error(err);
             alert("Error al actualizar rol.");
+        }
+    };
+
+    // Abrir modal de contraseña
+    const abrirModalPassword = (usuario) => {
+        setUsuarioSeleccionado(usuario);
+        setNuevaPassword('');
+        setErrorPassword('');
+        setShowPasswordModal(true);
+    };
+
+    // Cambiar contraseña
+    const handleCambiarPassword = async (e) => {
+        e.preventDefault();
+        setErrorPassword('');
+
+        if (nuevaPassword.trim().length < 6) {
+            setErrorPassword('La contraseña debe tener al menos 6 caracteres.');
+            return;
+        }
+
+        try {
+            await api.post(`/admin/usuarios/${usuarioSeleccionado.id}/cambiar-password/`, {
+                password: nuevaPassword.trim()
+            });
+            alert(`Contraseña de ${usuarioSeleccionado.username} cambiada con éxito.`);
+            setShowPasswordModal(false);
+        } catch (err) {
+            console.error("Error al cambiar contraseña:", err);
+            const msg = err.response?.data?.error || "Error al actualizar la contraseña.";
+            setErrorPassword(msg);
         }
     };
 
@@ -472,7 +509,13 @@ const ConfiguracionPanel = () => {
                                                             {u.is_active ? 'Activo' : 'Suspendido'}
                                                         </span>
                                                     </td>
-                                                    <td style={tableCellStyle}>
+                                                    <td style={{ ...tableCellStyle, display: 'flex', gap: '8px' }}>
+                                                        <button 
+                                                            style={changePasswordBtnStyle}
+                                                            onClick={() => abrirModalPassword(u)}
+                                                        >
+                                                            🔑 Clave
+                                                        </button>
                                                         <button 
                                                             style={actionButtonStyle(false, u.is_active)}
                                                             onClick={() => handleCambiarEstado(u.id, u.is_active)}
@@ -624,6 +667,80 @@ const ConfiguracionPanel = () => {
 
                 </div>
             </div>
+
+            {/* Modal de Cambio de Contraseña */}
+            {showPasswordModal && usuarioSeleccionado && (
+                <div style={modalBackdropStyle}>
+                    <div style={{ ...modalContentStyle, width: '400px' }}>
+                        <h3 style={{ margin: '0 0 15px 0', color: '#ffffff' }}>Cambiar Contraseña</h3>
+                        <p style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '15px' }}>
+                            Establecer nueva contraseña para el usuario <strong>{usuarioSeleccionado.username}</strong>.
+                        </p>
+                        <form onSubmit={handleCambiarPassword} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '13px', color: '#d1d5db', marginBottom: '6px' }}>Nueva Contraseña:</label>
+                                <input
+                                    type="password"
+                                    placeholder="Al menos 6 caracteres"
+                                    value={nuevaPassword}
+                                    onChange={e => setNuevaPassword(e.target.value)}
+                                    style={{
+                                        padding: '10px',
+                                        borderRadius: '6px',
+                                        border: '1px solid #374151',
+                                        backgroundColor: '#111827',
+                                        color: '#ffffff',
+                                        width: '100%',
+                                        outline: 'none'
+                                    }}
+                                    required
+                                    autoFocus
+                                    minLength={6}
+                                />
+                            </div>
+                            {errorPassword && (
+                                <p style={{ color: '#f87171', fontSize: '13px', margin: 0 }}>
+                                    ⚠️ {errorPassword}
+                                </p>
+                            )}
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
+                                <button 
+                                    type="button" 
+                                    onClick={() => setShowPasswordModal(false)}
+                                    style={{
+                                        padding: '8px 16px',
+                                        borderRadius: '6px',
+                                        border: '1px solid #374151',
+                                        backgroundColor: 'transparent',
+                                        color: '#d1d5db',
+                                        cursor: 'pointer',
+                                        fontWeight: '600',
+                                        fontSize: '13px'
+                                    }}
+                                >
+                                    Cancelar
+                                </button>
+                                <button 
+                                    type="submit"
+                                    style={{
+                                        padding: '8px 16px',
+                                        borderRadius: '6px',
+                                        border: 'none',
+                                        backgroundColor: '#3b82f6',
+                                        color: '#ffffff',
+                                        cursor: 'pointer',
+                                        fontWeight: '600',
+                                        fontSize: '13px'
+                                    }}
+                                >
+                                    Guardar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 };
@@ -935,5 +1052,40 @@ const actionButtonStyle = (isDanger, isActive) => ({
     fontSize: '12px',
     transition: 'background-color 0.2s'
 });
+
+const changePasswordBtnStyle = {
+    backgroundColor: '#3b82f6',
+    color: 'white',
+    border: 'none',
+    padding: '6px 12px',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontWeight: '600',
+    fontSize: '12px',
+    marginRight: '8px',
+    transition: 'background-color 0.2s'
+};
+
+const modalBackdropStyle = {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backdropFilter: 'blur(4px)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000
+};
+
+const modalContentStyle = {
+    backgroundColor: '#1f2937',
+    padding: '25px',
+    borderRadius: '12px',
+    border: '1px solid #374151',
+    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.5)'
+};
 
 export default ConfiguracionPanel;
