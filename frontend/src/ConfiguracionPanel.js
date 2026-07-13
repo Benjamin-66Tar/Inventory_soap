@@ -487,7 +487,7 @@ const ConfiguracionPanel = () => {
                                     </thead>
                                     <tbody>
                                         {usuarios.map(u => {
-                                            const uRol = u.perfil?.rol || 'OPERADOR';
+                                            const uRol = u.rol || 'OPERADOR';
                                             return (
                                                 <tr key={u.id} style={tableRowStyle}>
                                                     <td style={tableCellStyle}>{u.username}</td>
