@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { menuConfig } from './navigationConfig';
 import { useAuth } from '../context/AuthContext';
+import blueSoap from '../blue_soap.png';
 
 const emojiMap = {
   Soap: '🧼',
@@ -168,9 +169,13 @@ const Sidebar = () => {
                 onMouseEnter={() => setHoveredPath(item.path)}
                 onMouseLeave={() => setHoveredPath(null)}
               >
-                <span style={{ fontSize: '18px', display: 'inline-block', minWidth: '24px', textAlign: 'center' }}>
-                {iconEmoji}
-              </span>
+                <span style={{ fontSize: '18px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: '24px', height: '24px' }}>
+                  {item.icon === 'Soap' ? (
+                    <img src={blueSoap} alt="Soap Icon" style={{ width: '20px', height: '20px', objectFit: 'contain', borderRadius: '4px' }} />
+                  ) : (
+                    iconEmoji
+                  )}
+                </span>
               {isOpen && <span>{item.label}</span>}
             </NavLink>
           );

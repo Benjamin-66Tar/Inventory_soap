@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import blueSoap from '../../blue_soap.png';
 
 const Login = () => {
   const [usernameOrEmail, setUsernameOrEmail] = useState('');
@@ -146,7 +147,9 @@ const Login = () => {
   return (
     <div style={pageStyle}>
       <div style={cardStyle}>
-        <div style={logoContainerStyle}>🧼</div>
+        <div style={logoContainerStyle}>
+          <img src={blueSoap} alt="SoapManager Logo" style={{ width: '80px', height: '80px', objectFit: 'contain', borderRadius: '16px', boxShadow: '0 8px 16px rgba(0,0,0,0.2)' }} />
+        </div>
         <h1 style={titleStyle}>SoapManager</h1>
         <p style={subtitleStyle}>Ingresa tus credenciales para acceder al inventario</p>
 
