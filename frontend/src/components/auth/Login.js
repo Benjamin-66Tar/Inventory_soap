@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import blueSoap from '../../blue_soap.png';
+import blueSoap from '../../blue_soap_transparent.png';
 
 const Login = () => {
   const [usernameOrEmail, setUsernameOrEmail] = useState('');
@@ -60,7 +60,6 @@ const Login = () => {
   };
 
   const logoContainerStyle = {
-    fontSize: '48px',
     marginBottom: '15px',
     display: 'inline-block'
   };
@@ -148,7 +147,7 @@ const Login = () => {
     <div style={pageStyle}>
       <div style={cardStyle}>
         <div style={logoContainerStyle}>
-          <img src={blueSoap} alt="SoapManager Logo" style={{ width: '80px', height: '80px', objectFit: 'contain', borderRadius: '16px', boxShadow: '0 8px 16px rgba(0,0,0,0.2)' }} />
+          <img src={blueSoap} alt="SoapManager Logo" style={{ width: '120px', height: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 10px 20px rgba(96, 165, 250, 0.25))' }} />
         </div>
         <h1 style={titleStyle}>SoapManager</h1>
         <p style={subtitleStyle}>Ingresa tus credenciales para acceder al inventario</p>
