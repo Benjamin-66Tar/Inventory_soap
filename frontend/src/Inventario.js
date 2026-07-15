@@ -67,11 +67,13 @@ const Inventario = () => {
     }, []);
 
     return (
-        <div style={{ padding: '20px' }}>
-            <h1>Gestión de Inventario - Benys</h1>
+        <div style={{ padding: '0px' }}>
+            <h1 style={{ fontSize: '26px', fontWeight: '700', color: '#111827', margin: '0 0 24px 0', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+                {view === 'jabones' ? 'Inventario de Jabones' : 'Materias Primas'}
+            </h1>
 
             {/* Selector de Tabla (Tabs) */}
-            <div style={{ marginBottom: '20px', borderBottom: '2px solid #ccc' }}>
+            <div style={{ marginBottom: '24px', borderBottom: '1px solid #e5e7eb', display: 'flex' }}>
                 <button
                     onClick={() => setView('jabones')}
                     style={buttonStyle(view === 'jabones')}
@@ -118,14 +120,17 @@ const Inventario = () => {
 
 // Estilo básico para las pestañas
 const buttonStyle = (isActive) => ({
-    padding: '10px 20px',
+    padding: '10px 24px',
     cursor: 'pointer',
-    backgroundColor: isActive ? '#007bff' : '#f8f9fa',
-    color: isActive ? 'white' : 'black',
+    backgroundColor: 'transparent',
+    color: isActive ? '#1E3A8A' : '#6b7280',
     border: 'none',
-    borderBottom: isActive ? '3px solid #0056b3' : 'none',
-    marginRight: '5px',
-    fontWeight: 'bold'
+    borderBottom: isActive ? '3px solid #1E3A8A' : '3px solid transparent',
+    marginRight: '8px',
+    fontWeight: '600',
+    fontSize: '15px',
+    transition: 'all 0.2s ease',
+    outline: 'none'
 });
 
 export default Inventario;

@@ -11,14 +11,8 @@ const emojiMap = {
   History: '📜'
 };
 
-const roleLabels = {
-  ADMIN: 'Administrador',
-  SUPERVISOR: 'Supervisor',
-  OPERADOR: 'Operador'
-};
-
 const Sidebar = () => {
-  const { user, role, logout } = useAuth();
+  const { role, logout } = useAuth();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(true);
   const [hoveredPath, setHoveredPath] = useState(null);
@@ -29,7 +23,7 @@ const Sidebar = () => {
   // Estilos del contenedor principal
   const sidebarStyle = {
     width: isOpen ? '260px' : '75px',
-    backgroundColor: '#111827', // Gris muy oscuro premium
+    backgroundColor: '#0B1931', // Azul marino profundo premium
     color: '#f3f4f6',
     display: 'flex',
     flexDirection: 'column',
@@ -38,7 +32,7 @@ const Sidebar = () => {
     top: 0,
     left: 0,
     transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-    boxShadow: '4px 0 15px rgba(0, 0, 0, 0.2)',
+    boxShadow: '4px 0 15px rgba(0, 0, 0, 0.15)',
     fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     overflowX: 'hidden',
     flexShrink: 0
@@ -49,7 +43,7 @@ const Sidebar = () => {
     display: 'flex',
     alignItems: 'center',
     justifyContent: isOpen ? 'space-between' : 'center',
-    borderBottom: '1px solid #1f2937',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
     minHeight: '75px',
     boxSizing: 'border-box'
   };
@@ -57,7 +51,7 @@ const Sidebar = () => {
   const toggleBtnStyle = {
     background: 'none',
     border: 'none',
-    color: '#9ca3af',
+    color: '#a3b3cc',
     fontSize: '22px',
     cursor: 'pointer',
     padding: '5px',
@@ -66,14 +60,6 @@ const Sidebar = () => {
     alignItems: 'center',
     justifyContent: 'center',
     transition: 'color 0.2s, background-color 0.2s',
-  };
-
-  const profileStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '2px',
-    marginLeft: '10px',
-    flexGrow: 1
   };
 
   const navContainerStyle = {
@@ -92,12 +78,12 @@ const Sidebar = () => {
     padding: isOpen ? '12px 15px' : '12px 0',
     borderRadius: '8px',
     textDecoration: 'none',
-    color: isActive ? '#ffffff' : (isHovered ? '#ffffff' : '#9ca3af'),
-    backgroundColor: isActive ? '#007bff' : (isHovered ? '#1f2937' : 'transparent'),
+    color: isActive ? '#ffffff' : (isHovered ? '#ffffff' : '#a3b3cc'),
+    backgroundColor: isActive ? '#1E3A8A' : (isHovered ? 'rgba(255, 255, 255, 0.08)' : 'transparent'),
     fontWeight: isActive ? '600' : '500',
     fontSize: '15px',
     transition: 'all 0.2s ease-in-out',
-    boxShadow: isActive ? '0 4px 12px rgba(0, 123, 255, 0.3)' : 'none',
+    boxShadow: isActive ? '0 4px 12px rgba(30, 58, 138, 0.3)' : 'none',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
     width: '100%',
@@ -106,7 +92,7 @@ const Sidebar = () => {
 
   const footerStyle = {
     padding: '15px 10px',
-    borderTop: '1px solid #1f2937',
+    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
     display: 'flex',
     flexDirection: 'column',
     gap: '8px'
@@ -121,8 +107,8 @@ const Sidebar = () => {
     padding: isOpen ? '10px 15px' : '10px 0',
     background: 'transparent',
     border: 'none',
-    color: isDanger ? '#f87171' : (isHovered ? '#ffffff' : '#9ca3af'),
-    backgroundColor: isHovered ? (isDanger ? 'rgba(239, 68, 68, 0.1)' : '#1f2937') : 'transparent',
+    color: isDanger ? '#f87171' : (isHovered ? '#ffffff' : '#a3b3cc'),
+    backgroundColor: isHovered ? (isDanger ? 'rgba(239, 68, 68, 0.1)' : 'rgba(255, 255, 255, 0.08)') : 'transparent',
     fontSize: '14px',
     fontWeight: '500',
     cursor: 'pointer',
@@ -134,19 +120,18 @@ const Sidebar = () => {
 
   return (
     <aside style={sidebarStyle}>
-      {/* 1. Header con Toggle y Perfil */}
+      {/* 1. Header con Toggle y Logo Benys */}
       <div style={headerStyle}>
-        {isOpen && (
-          <div style={profileStyle}>
-            <p style={{ margin: 0, fontWeight: 'bold', fontSize: '16px', color: '#ffffff' }}>{user?.username || 'SoapManager'}</p>
-            <span style={{ fontSize: '12px', color: '#9ca3af' }}>{roleLabels[role] || 'Operador'}</span>
-          </div>
+        {isOpen ? (
+          <span style={{ fontSize: '24px', fontWeight: '800', color: '#ffffff', letterSpacing: '0.5px', marginLeft: '10px' }}>Benys</span>
+        ) : (
+          <span style={{ fontSize: '20px', fontWeight: '800', color: '#ffffff' }}>B</span>
         )}
         <button 
           onClick={toggleSidebar} 
           style={toggleBtnStyle}
-          onMouseOver={(e) => { e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.backgroundColor = '#1f2937'; }}
-          onMouseOut={(e) => { e.currentTarget.style.color = '#9ca3af'; e.currentTarget.style.backgroundColor = 'transparent'; }}
+          onMouseOver={(e) => { e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)'; }}
+          onMouseOut={(e) => { e.currentTarget.style.color = '#a3b3cc'; e.currentTarget.style.backgroundColor = 'transparent'; }}
         >
           ☰
         </button>
@@ -176,10 +161,10 @@ const Sidebar = () => {
                     iconEmoji
                   )}
                 </span>
-              {isOpen && <span>{item.label}</span>}
-            </NavLink>
-          );
-        })}
+                {isOpen && <span>{item.label}</span>}
+              </NavLink>
+            );
+          })}
       </nav>
 
       {/* 3. Footer del Sistema */}

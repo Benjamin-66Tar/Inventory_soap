@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import api from '../api/api';
 import ModalDesgloseStock from './ModalDesgloseStock';
 import { useAuth } from '../context/AuthContext';
+import { useSearch } from '../context/SearchContext';
 
 const TablaJabones = ({ datos = [], onRegistrarSalida, config }) => {
     const { role } = useAuth();
     const navigate = useNavigate();
-    const [searchTerm, setSearchTerm] = useState('');
+    const { searchTerm } = useSearch();
     const [categoryFilter, setCategoryFilter] = useState('');
     const [selectedJabon, setSelectedJabon] = useState(null);
     const [categorias, setCategorias] = useState([]);
@@ -98,23 +99,28 @@ const TablaJabones = ({ datos = [], onRegistrarSalida, config }) => {
     return (
         <section style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                <h2 style={{ margin: 0, color: '#333' }}>Productos Terminados</h2>
-            </div>
-
-            {/* Controles de búsqueda y filtrado */}
-            <div style={{ marginBottom: '15px', display: 'flex', gap: '10px' }}>
-                <input
-                    type="text"
-                    placeholder="Buscar jabón..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    style={{ padding: '10px', flex: 1, borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px', outline: 'none' }}
-                />
+        <div style={{ 
+            backgroundColor: 'white', 
+            borderRadius: '12px', 
+            padding: '24px', 
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.025)',
+            border: '1px solid #f3f4f6'
+        }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h2 style={{ margin: 0, color: '#1f2937', fontSize: '18px', fontWeight: '600' }}>Productos Terminados</h2>
                 <select
                     value={categoryFilter}
                     onChange={(e) => setCategoryFilter(e.target.value)}
-                    style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px', outline: 'none', backgroundColor: 'white' }}
+                    style={{ 
+                        padding: '8px 16px', 
+                        borderRadius: '8px', 
+                        border: '1px solid #e5e7eb', 
+                        fontSize: '13px', 
+                        outline: 'none', 
+                        backgroundColor: 'white',
+                        color: '#4b5563',
+                        cursor: 'pointer'
+                    }}
                 >
                     <option value="">Todas las categorías</option>
                     {categorias.map(cat => (
@@ -123,15 +129,16 @@ const TablaJabones = ({ datos = [], onRegistrarSalida, config }) => {
                 </select>
             </div>
 
-            <table border="1" cellPadding="10" style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse', border: '1px solid #eee', fontSize: '14px' }}>
+            <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse', fontSize: '14px' }}>
                 <thead>
-                    <tr style={{ backgroundColor: '#e6f7ff', color: '#333', borderBottom: '2px solid #ddd' }}>
-                        <th style={{ padding: '12px' }}>Jabón</th>
-                        <th style={{ padding: '12px' }}>Stock</th>
-                        <th style={{ padding: '12px' }}>Categoría</th>
-                        <th style={{ padding: '12px' }}>Peso Unitario</th>
-                        <th style={{ padding: '12px' }}>Estado</th>
-                        {role !== 'OPERADOR' && <th style={{ padding: '12px', textAlign: 'center' }}>Acciones</th>}
+                    <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                        <th style={{ padding: '16px 12px', color: '#4b5563', fontWeight: '600', backgroundColor: '#f9fafb', fontSize: '13px', width: '80px' }}>ID</th>
+                        <th style={{ padding: '16px 12px', color: '#4b5563', fontWeight: '600', backgroundColor: '#f9fafb', fontSize: '13px' }}>Producto</th>
+                        <th style={{ padding: '16px 12px', color: '#4b5563', fontWeight: '600', backgroundColor: '#f9fafb', fontSize: '13px' }}>Categoría</th>
+                        <th style={{ padding: '16px 12px', color: '#4b5563', fontWeight: '600', backgroundColor: '#f9fafb', fontSize: '13px' }}>Peso Unitario</th>
+                        <th style={{ padding: '16px 12px', color: '#4b5563', fontWeight: '600', backgroundColor: '#f9fafb', fontSize: '13px' }}>Stock</th>
+                        <th style={{ padding: '16px 12px', color: '#4b5563', fontWeight: '600', backgroundColor: '#f9fafb', fontSize: '13px' }}>Estado</th>
+                        {role !== 'OPERADOR' && <th style={{ padding: '16px 12px', color: '#4b5563', fontWeight: '600', backgroundColor: '#f9fafb', fontSize: '13px', textAlign: 'center', width: '220px' }}>Acciones</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -139,73 +146,99 @@ const TablaJabones = ({ datos = [], onRegistrarSalida, config }) => {
                         filteredJabones.map(j => {
                             const esCritico = j.cantidad < UMBRAL_CRITICO;
                             return (
-                                <tr key={j.id} style={{ borderBottom: '1px solid #eee', backgroundColor: esCritico ? '#fdf2f2' : 'transparent' }}>
-                                    <td style={{ padding: '12px', fontWeight: esCritico ? 'bold' : '500', color: esCritico ? '#dc3545' : '#333' }}>
+                                <tr key={j.id} style={{ borderBottom: '1px solid #f3f4f6', transition: 'background-color 0.2s' }}>
+                                    <td style={{ padding: '16px 12px', color: '#6b7280', fontSize: '13px' }}>
+                                        {j.id}
+                                    </td>
+                                    <td style={{ padding: '16px 12px', fontWeight: '500', color: '#1f2937' }}>
                                         {j.nombre}
                                     </td>
+                                    <td style={{ padding: '16px 12px', color: '#4b5563' }}>{j.categoria_nombre || 'Sin Categoría'}</td>
+                                    <td style={{ padding: '16px 12px', color: '#4b5563' }}>{j.peso_gramos}{config ? config.unidad_peso : 'g'}</td>
                                     <td 
                                         onClick={() => setSelectedJabon(j)}
                                         style={{ 
-                                            padding: '12px',
-                                            color: esCritico ? '#dc3545' : '#007bff', 
-                                            fontWeight: 'bold',
+                                            padding: '16px 12px',
+                                            color: esCritico ? '#dc2626' : '#1e40af', 
+                                            fontWeight: '600',
                                             cursor: 'pointer',
                                             textDecoration: 'underline dotted',
-                                            backgroundColor: 'rgba(0,123,255,0.02)'
+                                            textDecorationColor: esCritico ? '#dc2626' : '#1e40af'
                                         }}
                                         title="Toca para ver desglose de stock"
                                     >
                                         {j.cantidad} piezas
                                     </td>
-                                    <td style={{ padding: '12px' }}>{j.categoria_nombre || 'Sin Categoría'}</td>
-                                    <td style={{ padding: '12px' }}>{j.peso_gramos}{config ? config.unidad_peso : 'g'}</td>
-                                    <td style={{ padding: '12px' }}>
+                                    <td style={{ padding: '16px 12px' }}>
                                         {esCritico ? (
-                                            <span style={{ padding: '2px 6px', backgroundColor: '#fdf2f2', color: '#dc3545', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>
-                                                ⚠️ REABASTECER
+                                            <span style={{ 
+                                                display: 'inline-flex', 
+                                                alignItems: 'center', 
+                                                gap: '4px', 
+                                                padding: '4px 10px', 
+                                                backgroundColor: '#fee2e2', 
+                                                color: '#b91c1c', 
+                                                borderRadius: '12px', 
+                                                fontSize: '11.5px', 
+                                                fontWeight: '600' 
+                                            }}>
+                                                ⚠️ Reabastecer
                                             </span>
                                         ) : (
-                                            <span style={{ padding: '2px 6px', backgroundColor: '#f0fdf4', color: '#16a34a', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>
-                                                ✅ OK
+                                            <span style={{ 
+                                                display: 'inline-flex', 
+                                                alignItems: 'center', 
+                                                gap: '4px', 
+                                                padding: '4px 10px', 
+                                                backgroundColor: '#dcfce7', 
+                                                color: '#15803d', 
+                                                borderRadius: '12px', 
+                                                fontSize: '11.5px', 
+                                                fontWeight: '600' 
+                                            }}>
+                                                ✓ OK
                                             </span>
                                         )}
                                     </td>
                                     {role !== 'OPERADOR' && (
-                                        <td style={{ padding: '12px', textAlign: 'center' }}>
-                                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                                        <td style={{ padding: '16px 12px', textAlign: 'center' }}>
+                                            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
                                                 <button
                                                     onClick={() => navigate('/produccion', { state: { preselectedJabonId: j.id } })}
                                                     style={{
-                                                        backgroundColor: '#28a745',
+                                                        backgroundColor: '#0B1931',
                                                         color: 'white',
                                                         border: 'none',
-                                                        padding: '6px 12px',
-                                                        borderRadius: '4px',
+                                                        padding: '6px 14px',
+                                                        borderRadius: '20px',
                                                         cursor: 'pointer',
-                                                        fontSize: '13px',
-                                                        fontWeight: 'bold',
-                                                        boxShadow: '0 2px 4px rgba(40,167,69,0.15)',
-                                                        transition: 'background-color 0.2s'
+                                                        fontSize: '12px',
+                                                        fontWeight: '600',
+                                                        transition: 'background-color 0.2s',
+                                                        boxShadow: '0 2px 4px rgba(11, 25, 49, 0.1)'
                                                     }}
+                                                    onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#1E3A8A'; }}
+                                                    onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#0B1931'; }}
                                                 >
-                                                    Fabricar 🛠️
+                                                    Fabricar
                                                 </button>
                                                 <button
                                                     onClick={() => abrirModalSalida(j)}
                                                     style={{
-                                                        backgroundColor: '#e67e22',
-                                                        color: 'white',
-                                                        border: 'none',
-                                                        padding: '6px 12px',
-                                                        borderRadius: '4px',
+                                                        backgroundColor: 'transparent',
+                                                        color: '#0B1931',
+                                                        border: '1.5px solid #0B1931',
+                                                        padding: '4.5px 12px',
+                                                        borderRadius: '20px',
                                                         cursor: 'pointer',
-                                                        fontSize: '13px',
-                                                        fontWeight: 'bold',
-                                                        boxShadow: '0 2px 4px rgba(230,126,34,0.15)',
-                                                        transition: 'background-color 0.2s'
+                                                        fontSize: '12px',
+                                                        fontWeight: '600',
+                                                        transition: 'all 0.2s'
                                                     }}
+                                                    onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'rgba(11, 25, 49, 0.05)'; }}
+                                                    onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                                                 >
-                                                    Dar Salida 📤
+                                                    Dar Salida
                                                 </button>
                                             </div>
                                         </td>
@@ -215,11 +248,12 @@ const TablaJabones = ({ datos = [], onRegistrarSalida, config }) => {
                         })
                     ) : (
                         <tr>
-                            <td colSpan="6" style={{ textAlign: 'center', padding: '20px', color: '#999' }}>No se encontraron jabones.</td>
+                            <td colSpan="7" style={{ textAlign: 'center', padding: '30px', color: '#9ca3af' }}>No se encontraron jabones.</td>
                         </tr>
                     )}
                 </tbody>
             </table>
+        </div>
 
             {/* Modal de Desglose de Stock */}
             <ModalDesgloseStock

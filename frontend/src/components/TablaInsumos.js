@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useSearch } from '../context/SearchContext';
 
 const TablaInsumos = ({ datos = [], onAbrirFormulario, onReabastecer, config }) => {
     const { role } = useAuth();
-    const [searchTerm, setSearchTerm] = useState('');
+    const { searchTerm } = useSearch();
     const [providerFilter, setProviderFilter] = useState('');
 
     // Estados para el modal de reabastecimiento
@@ -53,89 +54,133 @@ const TablaInsumos = ({ datos = [], onAbrirFormulario, onReabastecer, config }) 
 
     return (
         <section style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                <h2 style={{ margin: 0, color: '#333' }}>Materia Prima (Insumos)</h2>
+            <div style={{ 
+                backgroundColor: 'white', 
+                borderRadius: '12px', 
+                padding: '24px', 
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.025)',
+                border: '1px solid #f3f4f6'
+            }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <h2 style={{ margin: 0, color: '#1f2937', fontSize: '18px', fontWeight: '600' }}>Materia Prima (Insumos)</h2>
+                    <select
+                        value={providerFilter}
+                        onChange={(e) => setProviderFilter(e.target.value)}
+                        style={{ 
+                            padding: '8px 16px', 
+                            borderRadius: '8px', 
+                            border: '1px solid #e5e7eb', 
+                            fontSize: '13px', 
+                            outline: 'none', 
+                            backgroundColor: 'white',
+                            color: '#4b5563',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        <option value="">Todos los proveedores</option>
+                        {proveedoresUnicos.map(p => (
+                            <option key={p} value={p}>{p}</option>
+                        ))}
+                    </select>
+                </div>
                 {role !== 'OPERADOR' && (
                     <button
                         onClick={onAbrirFormulario}
-                        style={{ backgroundColor: '#28a745', color: 'white', padding: '10px 20px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 2px 5px rgba(40, 167, 69, 0.2)' }}
+                        style={{ 
+                            backgroundColor: '#10b981', 
+                            color: 'white', 
+                            padding: '8px 20px', 
+                            borderRadius: '20px', 
+                            border: 'none', 
+                            cursor: 'pointer', 
+                            fontWeight: '600', 
+                            fontSize: '13px', 
+                            transition: 'background-color 0.2s',
+                            boxShadow: '0 2px 4px rgba(16, 185, 129, 0.15)' 
+                        }}
+                        onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#059669'; }}
+                        onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#10b981'; }}
                     >
                         + Nuevo Insumo
                     </button>
                 )}
             </div>
 
-            {/* Controles de búsqueda y filtrado */}
-            <div style={{ marginBottom: '15px', display: 'flex', gap: '10px' }}>
-                <input
-                    type="text"
-                    placeholder="Buscar insumo..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    style={{ padding: '10px', flex: 1, borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px', outline: 'none' }}
-                />
-                <select
-                    value={providerFilter}
-                    onChange={(e) => setProviderFilter(e.target.value)}
-                    style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px', outline: 'none', backgroundColor: 'white' }}
-                >
-                    <option value="">Todos los proveedores</option>
-                    {proveedoresUnicos.map(p => (
-                        <option key={p} value={p}>{p}</option>
-                    ))}
-                </select>
-            </div>
-
-            <table border="1" cellPadding="10" style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse', border: '1px solid #eee', fontSize: '14px' }}>
+            <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse', fontSize: '14px' }}>
                 <thead>
-                    <tr style={{ backgroundColor: '#f8f9fa', color: '#555', borderBottom: '2px solid #ddd' }}>
-                        <th style={{ padding: '12px' }}>Nombre</th>
-                        <th style={{ padding: '12px' }}>Cantidad ({unitSuffix})</th>
-                        <th style={{ padding: '12px' }}>Proveedor</th>
-                        <th style={{ padding: '12px' }}>Fecha de Ingreso</th>
-                        {role !== 'OPERADOR' && <th style={{ padding: '12px', textAlign: 'center' }}>Acciones</th>}
+                    <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                        <th style={{ padding: '16px 12px', color: '#4b5563', fontWeight: '600', backgroundColor: '#f9fafb', fontSize: '13px' }}>Nombre</th>
+                        <th style={{ padding: '16px 12px', color: '#4b5563', fontWeight: '600', backgroundColor: '#f9fafb', fontSize: '13px' }}>Cantidad ({unitSuffix})</th>
+                        <th style={{ padding: '16px 12px', color: '#4b5563', fontWeight: '600', backgroundColor: '#f9fafb', fontSize: '13px' }}>Proveedor</th>
+                        <th style={{ padding: '16px 12px', color: '#4b5563', fontWeight: '600', backgroundColor: '#f9fafb', fontSize: '13px' }}>Fecha de Ingreso</th>
+                        {role !== 'OPERADOR' && <th style={{ padding: '16px 12px', color: '#4b5563', fontWeight: '600', backgroundColor: '#f9fafb', fontSize: '13px', textAlign: 'center', width: '150px' }}>Acciones</th>}
                     </tr>
                 </thead>
                 <tbody>
                     {filteredInsumos.length > 0 ? (
-                        filteredInsumos.map(i => (
-                            <tr key={i.id} style={{ borderBottom: '1px solid #eee' }}>
-                                <td style={{ padding: '12px', fontWeight: '500' }}>{i.nombre}</td>
-                                <td style={{ padding: '12px' }}>
-                                    <span style={{ 
-                                        fontWeight: 'bold', 
-                                        color: i.cantidad_gramos <= (config ? config.umbral_critico_stock : 5) ? '#dc3545' : '#333' 
-                                    }}>
-                                        {i.cantidad_gramos} {unitSuffix}
-                                    </span>
-                                    {i.cantidad_gramos <= (config ? config.umbral_critico_stock : 5) && (
-                                        <span style={{ marginLeft: '8px', padding: '2px 6px', backgroundColor: '#fdf2f2', color: '#dc3545', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>
-                                            Stock Crítico ⚠️
+                        filteredInsumos.map(i => {
+                            const esCritico = i.cantidad_gramos <= (config ? config.umbral_critico_stock : 5);
+                            return (
+                                <tr key={i.id} style={{ borderBottom: '1px solid #f3f4f6', transition: 'background-color 0.2s' }}>
+                                    <td style={{ padding: '16px 12px', fontWeight: '500', color: '#1f2937' }}>{i.nombre}</td>
+                                    <td style={{ padding: '16px 12px' }}>
+                                        <span style={{ 
+                                            fontWeight: '600', 
+                                            color: esCritico ? '#dc2626' : '#1f2937' 
+                                        }}>
+                                            {i.cantidad_gramos} {unitSuffix}
                                         </span>
-                                    )}
-                                </td>
-                                <td style={{ padding: '12px' }}>{i.proveedor}</td>
-                                <td style={{ padding: '12px' }}>{i.fecha_ingreso}</td>
-                                {role !== 'OPERADOR' && (
-                                    <td style={{ padding: '12px', textAlign: 'center' }}>
-                                        <button
-                                            onClick={() => abrirModalReabastecer(i)}
-                                            style={{ backgroundColor: '#007bff', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px', boxShadow: '0 2px 4px rgba(0,123,255,0.1)' }}
-                                        >
-                                            Reabastecer 📥
-                                        </button>
+                                        {esCritico && (
+                                            <span style={{ 
+                                                marginLeft: '8px', 
+                                                padding: '4px 10px', 
+                                                backgroundColor: '#fee2e2', 
+                                                color: '#b91c1c', 
+                                                borderRadius: '12px', 
+                                                fontSize: '11px', 
+                                                fontWeight: '600' 
+                                            }}>
+                                                ⚠️ Stock Crítico
+                                            </span>
+                                        )}
                                     </td>
-                                )}
-                            </tr>
-                        ))
+                                    <td style={{ padding: '16px 12px', color: '#4b5563' }}>{i.proveedor}</td>
+                                    <td style={{ padding: '16px 12px', color: '#4b5563' }}>{i.fecha_ingreso}</td>
+                                    {role !== 'OPERADOR' && (
+                                        <td style={{ padding: '16px 12px', textAlign: 'center' }}>
+                                            <button
+                                                onClick={() => abrirModalReabastecer(i)}
+                                                style={{ 
+                                                    backgroundColor: '#0B1931', 
+                                                    color: 'white', 
+                                                    border: 'none', 
+                                                    padding: '6px 14px', 
+                                                    borderRadius: '20px', 
+                                                    cursor: 'pointer', 
+                                                    fontWeight: '600', 
+                                                    fontSize: '12px', 
+                                                    transition: 'background-color 0.2s',
+                                                    boxShadow: '0 2px 4px rgba(11, 25, 49, 0.1)' 
+                                                }}
+                                                onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#1E3A8A'; }}
+                                                onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#0B1931'; }}
+                                            >
+                                                Reabastecer
+                                            </button>
+                                        </td>
+                                    )}
+                                </tr>
+                            );
+                        })
                     ) : (
                         <tr>
-                            <td colSpan="5" style={{ textAlign: 'center', padding: '20px', color: '#999' }}>No se encontraron insumos.</td>
+                            <td colSpan="5" style={{ textAlign: 'center', padding: '30px', color: '#9ca3af' }}>No se encontraron insumos.</td>
                         </tr>
                     )}
                 </tbody>
             </table>
+        </div>
 
             {/* Modal para Reabastecimiento */}
             {showReabastecerModal && insumoSeleccionado && (
