@@ -120,12 +120,9 @@ const Sidebar = () => {
 
   return (
     <aside style={sidebarStyle}>
-      {/* 1. Header con Toggle y Logo Benys */}
       <div style={headerStyle}>
-        {isOpen ? (
+        {isOpen && (
           <span style={{ fontSize: '24px', fontWeight: '800', color: '#ffffff', letterSpacing: '0.5px', marginLeft: '10px' }}>SoapManager</span>
-        ) : (
-          <span style={{ fontSize: '20px', fontWeight: '800', color: '#ffffff' }}>B</span>
         )}
         <button 
           onClick={toggleSidebar} 
