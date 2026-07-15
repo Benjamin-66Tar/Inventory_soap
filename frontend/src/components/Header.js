@@ -4,9 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import { useSearch } from '../context/SearchContext';
 
 const roleLabels = {
-  ADMIN: 'Benys Admin',
-  SUPERVISOR: 'Benys Supervisor',
-  OPERADOR: 'Benys Operador'
+  ADMIN: 'Admin',
+  SUPERVISOR: 'Supervisor',
+  OPERADOR: 'Operador'
 };
 
 const Header = () => {
@@ -139,7 +139,7 @@ const Header = () => {
         <div style={profileStyle}>
           <div style={avatarStyle}>👤</div>
           <div style={userTextContainer}>
-            <p style={userNameStyle}>{user?.username || 'Benys Admin'}</p>
+            <p style={userNameStyle}>{user?.username || 'Admin'}</p>
             <p style={userRoleStyle}>{roleLabels[role] || 'Administrador'}</p>
           </div>
         </div>
