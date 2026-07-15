@@ -4,7 +4,7 @@ from .models import Insumos, Jabon, ConsumoInsumo, SalidaJabon
 # Personalización del encabezado del panel (Opcional pero recomendado)
 admin.site.site_header = "Administración de Inventario Benys"
 admin.site.index_title = "Panel de Control de Insumos y Jabones"
-admin.site.site_title = "Benys Admin"
+admin.site.site_title = "Admin"
 
 
 @admin.register(Insumos)

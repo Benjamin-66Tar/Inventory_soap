@@ -167,7 +167,7 @@ const HistorialProduccion = () => {
 
     return (
         <div style={styles.container}>
-            <h2 style={styles.title}>Historiales de Actividad (Benys)</h2>
+            <h2 style={styles.title}>Historiales de Actividad</h2>
 
             {/* Pestañas Superiores Horizontales */}
             <div style={tabContainerStyle}>

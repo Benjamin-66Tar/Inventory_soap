@@ -54,7 +54,7 @@ const Curado = () => {
 
     return (
         <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto' }}>
-            <h2>Panel de Curado (Benys)</h2>
+            <h2>Panel de Curado</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '15px' }}>
                 {lotes.map(lote => {
                     const diasRestantes = calcularDiasRestantes(lote.fecha_termino_curado);
