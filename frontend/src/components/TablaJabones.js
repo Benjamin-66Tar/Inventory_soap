@@ -129,6 +129,7 @@ const TablaJabones = ({ datos = [], onRegistrarSalida, config }) => {
                 </select>
             </div>
 
+            <div style={{ overflowX: 'auto', width: '100%' }}>
             <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse', fontSize: '14px' }}>
                 <thead>
                     <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
@@ -253,6 +254,7 @@ const TablaJabones = ({ datos = [], onRegistrarSalida, config }) => {
                     )}
                 </tbody>
             </table>
+            </div>
         </div>
 
             {/* Modal de Desglose de Stock */}

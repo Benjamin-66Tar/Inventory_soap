@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { menuConfig } from './navigationConfig';
 import { useAuth } from '../context/AuthContext';
+import { useResponsive } from '../context/ResponsiveContext';
 import blueSoap from '../blue_soap_transparent.png';
 
 const emojiMap = {
@@ -11,8 +12,9 @@ const emojiMap = {
   History: '📜'
 };
 
-const Sidebar = () => {
+const Sidebar = ({ isOpenMobile, onCloseMobile }) => {
   const { role, logout } = useAuth();
+  const { isMobile } = useResponsive();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(true);
   const [hoveredPath, setHoveredPath] = useState(null);
@@ -22,16 +24,18 @@ const Sidebar = () => {
 
   // Estilos del contenedor principal
   const sidebarStyle = {
-    width: isOpen ? '260px' : '75px',
+    width: isMobile ? '260px' : (isOpen ? '260px' : '75px'),
     backgroundColor: '#0B1931', // Azul marino profundo premium
     color: '#f3f4f6',
     display: 'flex',
     flexDirection: 'column',
     height: '100vh',
-    position: 'sticky',
+    position: isMobile ? 'fixed' : 'sticky',
     top: 0,
     left: 0,
-    transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    zIndex: isMobile ? 1000 : 1,
+    transform: isMobile ? (isOpenMobile ? 'translateX(0)' : 'translateX(-100%)') : 'none',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     boxShadow: '4px 0 15px rgba(0, 0, 0, 0.15)',
     fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     overflowX: 'hidden',
@@ -42,7 +46,7 @@ const Sidebar = () => {
     padding: '20px',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: isOpen ? 'space-between' : 'center',
+    justifyContent: isMobile ? 'space-between' : (isOpen ? 'space-between' : 'center'),
     borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
     minHeight: '75px',
     boxSizing: 'border-box'
@@ -121,17 +125,26 @@ const Sidebar = () => {
   return (
     <aside style={sidebarStyle}>
       <div style={headerStyle}>
-        {isOpen && (
+        {(isOpen || isMobile) && (
           <span style={{ fontSize: '24px', fontWeight: '800', color: '#ffffff', letterSpacing: '0.5px', marginLeft: '10px' }}>SoapManager</span>
         )}
-        <button 
-          onClick={toggleSidebar} 
-          style={toggleBtnStyle}
-          onMouseOver={(e) => { e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)'; }}
-          onMouseOut={(e) => { e.currentTarget.style.color = '#a3b3cc'; e.currentTarget.style.backgroundColor = 'transparent'; }}
-        >
-          ☰
-        </button>
+        {isMobile ? (
+          <button 
+            onClick={onCloseMobile} 
+            style={{ ...toggleBtnStyle, fontSize: '20px', padding: '5px 10px' }}
+          >
+            ✕
+          </button>
+        ) : (
+          <button 
+            onClick={toggleSidebar} 
+            style={toggleBtnStyle}
+            onMouseOver={(e) => { e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.color = '#a3b3cc'; e.currentTarget.style.backgroundColor = 'transparent'; }}
+          >
+            ☰
+          </button>
+        )}
       </div>
 
       {/* 2. Lista Vertical de Enlaces */}

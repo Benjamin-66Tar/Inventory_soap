@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSearch } from '../context/SearchContext';
+import { useResponsive } from '../context/ResponsiveContext';
 
 const roleLabels = {
   ADMIN: 'Admin',
@@ -9,9 +10,10 @@ const roleLabels = {
   OPERADOR: 'Operador'
 };
 
-const Header = () => {
+const Header = ({ onToggleSidebar }) => {
   const { user, role } = useAuth();
   const { searchTerm, setSearchTerm } = useSearch();
+  const { isMobile } = useResponsive();
   const navigate = useNavigate();
 
   const handleSearchChange = (e) => {
@@ -25,7 +27,7 @@ const Header = () => {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '0 30px',
+    padding: isMobile ? '0 15px' : '0 30px',
     fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     boxSizing: 'border-box',
     position: 'sticky',
@@ -39,7 +41,7 @@ const Header = () => {
     backgroundColor: '#f3f4f6',
     borderRadius: '24px',
     padding: '8px 16px',
-    width: '320px',
+    width: isMobile ? '120px' : '320px',
     transition: 'all 0.2s ease',
     border: '1px solid transparent'
   };
@@ -58,7 +60,7 @@ const Header = () => {
   const rightSectionStyle = {
     display: 'flex',
     alignItems: 'center',
-    gap: '20px'
+    gap: isMobile ? '10px' : '20px'
   };
 
   const profileStyle = {
@@ -66,7 +68,7 @@ const Header = () => {
     alignItems: 'center',
     gap: '10px',
     backgroundColor: '#f9fafb',
-    padding: '6px 14px',
+    padding: isMobile ? '6px 8px' : '6px 14px',
     borderRadius: '20px',
     border: '1px solid #f3f4f6'
   };
@@ -118,6 +120,26 @@ const Header = () => {
 
   return (
     <header style={headerStyle}>
+      {/* Menu toggle button on mobile */}
+      {isMobile && (
+        <button 
+          onClick={onToggleSidebar}
+          style={{
+            background: 'none',
+            border: 'none',
+            fontSize: '24px',
+            cursor: 'pointer',
+            marginRight: '10px',
+            color: '#374151',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          ☰
+        </button>
+      )}
+
       {/* Buscador alineado a la izquierda */}
       <div 
         style={searchContainerStyle}
@@ -138,10 +160,12 @@ const Header = () => {
       <div style={rightSectionStyle}>
         <div style={profileStyle}>
           <div style={avatarStyle}>👤</div>
-          <div style={userTextContainer}>
-            <p style={userNameStyle}>{user?.username || 'Admin'}</p>
-            <p style={userRoleStyle}>{roleLabels[role] || 'Administrador'}</p>
-          </div>
+          {!isMobile && (
+            <div style={userTextContainer}>
+              <p style={userNameStyle}>{user?.username || 'Admin'}</p>
+              <p style={userRoleStyle}>{roleLabels[role] || 'Administrador'}</p>
+            </div>
+          )}
         </div>
 
         {role === 'ADMIN' && (

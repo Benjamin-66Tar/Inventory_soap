@@ -107,6 +107,7 @@ const TablaInsumos = ({ datos = [], onAbrirFormulario, onReabastecer, config }) 
                 )}
             </div>
 
+            <div style={{ overflowX: 'auto', width: '100%' }}>
             <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse', fontSize: '14px' }}>
                 <thead>
                     <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
@@ -180,6 +181,7 @@ const TablaInsumos = ({ datos = [], onAbrirFormulario, onReabastecer, config }) 
                     )}
                 </tbody>
             </table>
+            </div>
         </div>
 
             {/* Modal para Reabastecimiento */}
