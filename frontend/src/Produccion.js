@@ -479,27 +479,17 @@ const Produccion = () => {
                         {/* Seleccionar Jabon */}
                         <div style={{ marginBottom: '15px' }}>
                             <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Producto a Elaborar (Jabón):</label>
-                            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                                <select
-                                    value={jabonSeleccionado}
-                                    onChange={e => setJabonSeleccionado(e.target.value)}
-                                    style={{ ...inputStyle, flex: 1, margin: 0 }}
-                                    required
-                                >
-                                    <option value="">Seleccione un jabón...</option>
-                                    {jabones.map(j => (
-                                        <option key={j.id} value={j.id}>{j.nombre}</option>
-                                    ))}
-                                </select>
-                                <button
-                                    type="button"
-                                    onClick={() => setShowQuickCreateJabon(true)}
-                                    style={plusButtonStyle}
-                                    title="Registrar nuevo perfil de Jabón"
-                                >
-                                    +
-                                </button>
-                            </div>
+                            <select
+                                value={jabonSeleccionado}
+                                onChange={e => setJabonSeleccionado(e.target.value)}
+                                style={{ ...inputStyle, width: '100%', margin: 0 }}
+                                required
+                            >
+                                <option value="">Seleccione un jabón...</option>
+                                {jabones.map(j => (
+                                    <option key={j.id} value={j.id}>{j.nombre}</option>
+                                ))}
+                            </select>
                         </div>
 
                         {/* Seleccionar Tipo de Proceso */}
@@ -1245,22 +1235,6 @@ const inputStyle = {
     boxSizing: 'border-box'
 };
 
-const plusButtonStyle = {
-    backgroundColor: '#28a745',
-    color: 'white',
-    border: 'none',
-    padding: '8px',
-    borderRadius: '4px',
-    fontSize: '18px',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '36px',
-    width: '36px',
-    margin: 0
-};
 
 const errorBannerStyle = {
     padding: '12px',
