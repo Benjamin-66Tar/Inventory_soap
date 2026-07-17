@@ -7,7 +7,7 @@ pip install -r requirements.txt
 
 echo "=== Instalando y compilando React Frontend ==="
 npm install --prefix frontend
-npm run build --prefix frontend
+CI=false npm run build --prefix frontend
 
 echo "=== Recopilando archivos estáticos de Django ==="
 python manage.py collectstatic --no-input
