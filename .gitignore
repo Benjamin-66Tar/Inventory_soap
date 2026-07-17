@@ -2,3 +2,7 @@
 
 .venv/
 venv/
+
+# Ignorar base de datos SQLite y respaldos
+*.sqlite3
+*.backup

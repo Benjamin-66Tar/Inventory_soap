@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv  # Asegúrate de tener esta línea
+import dj_database_url
 
 # --- CARGAR VARIABLES DE ENTORNO ---
 load_dotenv()  # Esto lee el archivo .env que creaste
@@ -51,10 +52,9 @@ ROOT_URLCONF = "InventoryPro.urls" # Asegúrate que este nombre coincida con tu 
 
 # --- BASE DE DATOS (Obligatorio) ---
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3", # nombre de la base de datos
-    }
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / os.getenv('DB_NAME', 'db.sqlite3')}"
+    )
 }
 
 # --- REST FRAMEWORK ---
