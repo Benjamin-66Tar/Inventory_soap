@@ -53,7 +53,8 @@ ROOT_URLCONF = "InventoryPro.urls" # Asegúrate que este nombre coincida con tu 
 # --- BASE DE DATOS (Obligatorio) ---
 DATABASES = {
     "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / os.getenv('DB_NAME', 'db.sqlite3')}"
+        default=f"sqlite:///{BASE_DIR / os.getenv('DB_NAME', 'db.sqlite3')}",
+        disable_server_side_cursors=True,
     )
 }
 
