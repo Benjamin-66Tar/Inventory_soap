@@ -14,3 +14,7 @@ python manage.py collectstatic --no-input
 
 echo "=== Aplicando migraciones de la base de datos ==="
 python manage.py migrate
+
+echo "=== Creando administrador inicial ==="
+python create_initial_admin.py
+
