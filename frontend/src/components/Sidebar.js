@@ -29,7 +29,7 @@ const Sidebar = ({ isOpenMobile, onCloseMobile }) => {
     color: '#f3f4f6',
     display: 'flex',
     flexDirection: 'column',
-    height: '100vh',
+    height: isMobile ? '100dvh' : '100vh',
     position: isMobile ? 'fixed' : 'sticky',
     top: 0,
     left: 0,
@@ -39,6 +39,7 @@ const Sidebar = ({ isOpenMobile, onCloseMobile }) => {
     boxShadow: '4px 0 15px rgba(0, 0, 0, 0.15)',
     fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     overflowX: 'hidden',
+    overflowY: 'auto',
     flexShrink: 0
   };
 
