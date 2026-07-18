@@ -1,0 +1,400 @@
+[
+{
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$1000000$RvstyHm20W4Stm1WTAMi4X$hFHAjpRqqODgat1VoU0tSw4UcS2PCgtVdehrFUPwJRM=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "admin.demo",
+        "first_name": "Admin",
+        "last_name": "Demo",
+        "email": "admin@demo.com",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2026-07-16T01:36:35.414Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+        "password": "pbkdf2_sha256$1000000$lOVl9gLvU2VGYy7iTpzrYE$yo1/4DZm5DOCnH7NmlDmQb6fnoGDAI4SZPVcx6DWR54=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "supervisor.demo",
+        "first_name": "Supervisor",
+        "last_name": "Demo",
+        "email": "supervisor@demo.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2026-07-16T01:36:35.728Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "auth.user",
+    "pk": 3,
+    "fields": {
+        "password": "pbkdf2_sha256$1000000$fFl3DCpcuRQGGTFrkXTIWC$wWoWeymUZKNzPIJs5oVOCQjVhjaq7+xAnjsAFSY7NKI=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "operador.demo",
+        "first_name": "Operador",
+        "last_name": "Demo",
+        "email": "operador@demo.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2026-07-16T01:36:36.045Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "inventory.insumos",
+    "pk": 1,
+    "fields": {
+        "nombre": "Aceite de Coco",
+        "cantidad_gramos": 2500.0,
+        "proveedor": "Distribuidora Química S.A.",
+        "fecha_ingreso": "2026-06-25"
+    }
+},
+{
+    "model": "inventory.insumos",
+    "pk": 2,
+    "fields": {
+        "nombre": "Aceite de Oliva",
+        "cantidad_gramos": 3000.0,
+        "proveedor": "Aceites del Sur",
+        "fecha_ingreso": "2026-06-25"
+    }
+},
+{
+    "model": "inventory.insumos",
+    "pk": 3,
+    "fields": {
+        "nombre": "Glicerina Pura",
+        "cantidad_gramos": 6000.0,
+        "proveedor": "Mercado Libre",
+        "fecha_ingreso": "2026-06-30"
+    }
+},
+{
+    "model": "inventory.insumos",
+    "pk": 4,
+    "fields": {
+        "nombre": "Aceite Esencial de Lavanda",
+        "cantidad_gramos": 500.0,
+        "proveedor": "Aromas Naturales",
+        "fecha_ingreso": "2026-07-05"
+    }
+},
+{
+    "model": "inventory.configuracionsistema",
+    "pk": 1,
+    "fields": {
+        "unidad_peso": "g",
+        "dias_curado_defecto": 28,
+        "umbral_critico_stock": 10
+    }
+},
+{
+    "model": "inventory.categoria",
+    "pk": 3,
+    "fields": {
+        "nombre": "Cuidado Personal"
+    }
+},
+{
+    "model": "inventory.categoria",
+    "pk": 4,
+    "fields": {
+        "nombre": "Exfoliantes"
+    }
+},
+{
+    "model": "inventory.categoria",
+    "pk": 5,
+    "fields": {
+        "nombre": "Aromaterapia"
+    }
+},
+{
+    "model": "inventory.jabon",
+    "pk": 1,
+    "fields": {
+        "nombre": "Jabón Relajante de Lavanda",
+        "cantidad": 40,
+        "categoria": 5,
+        "fecha_elaboracion": "2026-06-10",
+        "peso_gramos": 100.0
+    }
+},
+{
+    "model": "inventory.jabon",
+    "pk": 2,
+    "fields": {
+        "nombre": "Jabón Exfoliante de Café",
+        "cantidad": 20,
+        "categoria": 4,
+        "fecha_elaboracion": "2026-06-15",
+        "peso_gramos": 120.0
+    }
+},
+{
+    "model": "inventory.jabon",
+    "pk": 3,
+    "fields": {
+        "nombre": "Jabón Suave de Avena",
+        "cantidad": 10,
+        "categoria": 3,
+        "fecha_elaboracion": "2026-07-10",
+        "peso_gramos": 90.0
+    }
+},
+{
+    "model": "inventory.salidajabon",
+    "pk": 1,
+    "fields": {
+        "jabon": 1,
+        "cantidad_salida": 5,
+        "motivo_salida": "VENTA",
+        "notas": "Venta directa de demostración a cliente",
+        "fecha_salida": "2026-07-14T00:36:35.411Z"
+    }
+},
+{
+    "model": "inventory.receta",
+    "pk": 1,
+    "fields": {
+        "jabon": 1,
+        "cantidad_piezas_base": 10
+    }
+},
+{
+    "model": "inventory.receta",
+    "pk": 2,
+    "fields": {
+        "jabon": 2,
+        "cantidad_piezas_base": 10
+    }
+},
+{
+    "model": "inventory.recetainsumo",
+    "pk": 1,
+    "fields": {
+        "receta": 1,
+        "insumo": 1,
+        "cantidad_base": 250.0
+    }
+},
+{
+    "model": "inventory.recetainsumo",
+    "pk": 2,
+    "fields": {
+        "receta": 1,
+        "insumo": 2,
+        "cantidad_base": 250.0
+    }
+},
+{
+    "model": "inventory.recetainsumo",
+    "pk": 3,
+    "fields": {
+        "receta": 1,
+        "insumo": 3,
+        "cantidad_base": 500.0
+    }
+},
+{
+    "model": "inventory.recetainsumo",
+    "pk": 4,
+    "fields": {
+        "receta": 1,
+        "insumo": 4,
+        "cantidad_base": 20.0
+    }
+},
+{
+    "model": "inventory.recetainsumo",
+    "pk": 5,
+    "fields": {
+        "receta": 2,
+        "insumo": 1,
+        "cantidad_base": 300.0
+    }
+},
+{
+    "model": "inventory.recetainsumo",
+    "pk": 6,
+    "fields": {
+        "receta": 2,
+        "insumo": 2,
+        "cantidad_base": 200.0
+    }
+},
+{
+    "model": "inventory.recetainsumo",
+    "pk": 7,
+    "fields": {
+        "receta": 2,
+        "insumo": 3,
+        "cantidad_base": 500.0
+    }
+},
+{
+    "model": "inventory.produccion",
+    "pk": 1,
+    "fields": {
+        "tipo": "ESTANDAR",
+        "receta": null,
+        "jabon_producido": 3,
+        "fecha_elaboracion": "2026-06-11T00:36:35.360Z",
+        "unidades_resultantes": 10,
+        "temperatura_mezcla": null,
+        "notas": "Lote inicial de avena para stock",
+        "costo_total": "0.00",
+        "en_curado": false,
+        "fecha_termino_curado": "2026-07-08",
+        "completada": true
+    }
+},
+{
+    "model": "inventory.produccion",
+    "pk": 2,
+    "fields": {
+        "tipo": "ESTANDAR",
+        "receta": null,
+        "jabon_producido": 1,
+        "fecha_elaboracion": "2026-07-11T00:36:35.397Z",
+        "unidades_resultantes": 30,
+        "temperatura_mezcla": null,
+        "notas": "Producción mensual estándar",
+        "costo_total": "0.00",
+        "en_curado": true,
+        "fecha_termino_curado": "2026-08-07",
+        "completada": false
+    }
+},
+{
+    "model": "inventory.detalleproduccioninsumo",
+    "pk": 1,
+    "fields": {
+        "produccion": 1,
+        "insumo": 3,
+        "lote_origen": "N/A",
+        "cantidad_utilizada": "500.00",
+        "costo_unitario_momento": "0.05"
+    }
+},
+{
+    "model": "inventory.detalleproduccioninsumo",
+    "pk": 2,
+    "fields": {
+        "produccion": 2,
+        "insumo": 1,
+        "lote_origen": "N/A",
+        "cantidad_utilizada": "750.00",
+        "costo_unitario_momento": "0.05"
+    }
+},
+{
+    "model": "inventory.detalleproduccioninsumo",
+    "pk": 3,
+    "fields": {
+        "produccion": 2,
+        "insumo": 2,
+        "lote_origen": "N/A",
+        "cantidad_utilizada": "750.00",
+        "costo_unitario_momento": "0.05"
+    }
+},
+{
+    "model": "inventory.detalleproduccioninsumo",
+    "pk": 4,
+    "fields": {
+        "produccion": 2,
+        "insumo": 3,
+        "lote_origen": "N/A",
+        "cantidad_utilizada": "1500.00",
+        "costo_unitario_momento": "0.05"
+    }
+},
+{
+    "model": "inventory.detalleproduccioninsumo",
+    "pk": 5,
+    "fields": {
+        "produccion": 2,
+        "insumo": 4,
+        "lote_origen": "N/A",
+        "cantidad_utilizada": "60.00",
+        "costo_unitario_momento": "0.05"
+    }
+},
+{
+    "model": "inventory.perfilusuario",
+    "pk": 1,
+    "fields": {
+        "user": 1,
+        "rol": "ADMIN"
+    }
+},
+{
+    "model": "inventory.perfilusuario",
+    "pk": 2,
+    "fields": {
+        "user": 2,
+        "rol": "SUPERVISOR"
+    }
+},
+{
+    "model": "inventory.perfilusuario",
+    "pk": 3,
+    "fields": {
+        "user": 3,
+        "rol": "OPERADOR"
+    }
+},
+{
+    "model": "inventory.bitacoraactividades",
+    "pk": 1,
+    "fields": {
+        "usuario": 1,
+        "accion": "Sembrado de Base de Datos Demo",
+        "detalles": "Se inicializó la base de datos con datos simulados y usuarios demo para demostración.",
+        "fecha_hora": "2026-07-16T01:36:36.349Z"
+    }
+},
+{
+    "model": "inventory.bitacoraactividades",
+    "pk": 2,
+    "fields": {
+        "usuario": 1,
+        "accion": "Creación de Jabón",
+        "detalles": "Creado jabón de avena en el inventario.",
+        "fecha_hora": "2026-07-16T01:36:36.351Z"
+    }
+},
+{
+    "model": "inventory.bitacoraactividades",
+    "pk": 3,
+    "fields": {
+        "usuario": 1,
+        "accion": "Inicio de Sesión",
+        "detalles": "Inicio de sesión exitoso en el sistema. Rol: Administrador",
+        "fecha_hora": "2026-07-16T01:39:39.181Z"
+    }
+},
+{
+    "model": "authtoken.token",
+    "pk": "c5400168bf7841f2f7e0458d03c98ca33e99d191",
+    "fields": {
+        "user": 1,
+        "created": "2026-07-16T01:39:39.177Z"
+    }
+}
+]

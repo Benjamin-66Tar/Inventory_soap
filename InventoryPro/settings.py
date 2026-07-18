@@ -11,13 +11,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # --- SEGURIDAD ---
 # Ahora usamos os.getenv para jalar los datos del .env
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-fallback-key-for-render-deploy")
 
 # DEBUG ahora es dinámico (se vuelve False automáticamente si en el .env pones False)
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
 # ALLOWED_HOSTS se convierte en lista automáticamente
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+
+# Si estamos en Render, agregar automáticamente el hostname externo
+RENDER_EXTERNAL_HOSTNAME = os.getenv('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # --- APPS ---
 INSTALLED_APPS = [ #En esta parte le dice a Django que módulos, herramientas o aplicaciones estan activas y cuales se deben integrar ene el proyecto
