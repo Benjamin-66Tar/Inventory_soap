@@ -124,10 +124,12 @@ const formStyle = {
     display: 'flex',
     flexDirection: 'column',
     gap: '15px',
-    padding: '30px',
+    padding: '25px',
     background: 'white',
     borderRadius: '12px',
-    width: '380px',
+    width: '90%',
+    maxWidth: '380px',
+    boxSizing: 'border-box',
     boxShadow: '0 8px 30px rgba(0, 0, 0, 0.15)',
     borderLeft: '6px solid #007bff'
 };

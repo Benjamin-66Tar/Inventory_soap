@@ -970,7 +970,13 @@ const Produccion = () => {
             {/* Modal para Crear/Editar Recetas */}
             {showRecetaModal && (
                 <div style={modalBackdropStyle}>
-                    <div style={{ ...modalContentStyle, width: '500px', borderLeft: '6px solid #28a745' }}>
+                    <div style={{ 
+                        ...modalContentStyle, 
+                        width: isMobile ? '92%' : '500px', 
+                        maxWidth: '500px', 
+                        borderLeft: '6px solid #28a745',
+                        padding: isMobile ? '15px' : '30px'
+                    }}>
                         <h3 style={{ margin: '0 0 15px 0', color: '#28a745' }}>
                             {selectedReceta ? 'Editar Receta' : 'Nueva Receta de Producción'}
                         </h3>
@@ -1012,13 +1018,19 @@ const Produccion = () => {
                                 <label style={labelStyle}>Insumos Base de la Receta:</label>
                                 <div style={{ maxHeight: '180px', overflowY: 'auto', border: '1px solid #eee', padding: '10px', borderRadius: '6px', marginBottom: '5px' }}>
                                     {recetaForm.ingredientes.map((ing, index) => (
-                                        <div key={index} style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '8px' }}>
+                                        <div key={index} style={{ display: 'flex', gap: isMobile ? '6px' : '10px', alignItems: 'center', marginBottom: '8px' }}>
                                             
                                             {/* Selector Insumo */}
                                             <select
                                                 value={ing.insumo}
                                                 onChange={e => manejarCambioIngrediente(index, 'insumo', e.target.value)}
-                                                style={{ ...inputStyle, margin: 0, flex: 2 }}
+                                                style={{ 
+                                                    ...inputStyle, 
+                                                    padding: isMobile ? '8px 6px' : '10px', 
+                                                    fontSize: isMobile ? '13px' : '14px', 
+                                                    margin: 0, 
+                                                    flex: 2 
+                                                }}
                                                 required
                                             >
                                                 <option value="">Seleccionar Insumo...</option>
@@ -1034,7 +1046,13 @@ const Produccion = () => {
                                                 placeholder={`Cant. (${unitSuffix})`}
                                                 value={ing.cantidad_base}
                                                 onChange={e => manejarCambioIngrediente(index, 'cantidad_base', e.target.value)}
-                                                style={{ ...inputStyle, margin: 0, flex: 1 }}
+                                                style={{ 
+                                                    ...inputStyle, 
+                                                    padding: isMobile ? '8px 6px' : '10px', 
+                                                    fontSize: isMobile ? '13px' : '14px', 
+                                                    margin: 0, 
+                                                    flex: 1.2 
+                                                }}
                                                 required
                                             />
 
@@ -1046,7 +1064,7 @@ const Produccion = () => {
                                                     backgroundColor: '#dc3545',
                                                     color: 'white',
                                                     border: 'none',
-                                                    padding: '8px 12px',
+                                                    padding: isMobile ? '8px 10px' : '8px 12px',
                                                     borderRadius: '4px',
                                                     cursor: 'pointer',
                                                     fontWeight: 'bold'
@@ -1092,7 +1110,13 @@ const Produccion = () => {
             {/* Modal de Confirmación para Eliminar Jabón */}
             {showConfirmDeleteModal && jabonAEliminar && (
                 <div style={modalBackdropStyle}>
-                    <div style={{ ...modalContentStyle, width: '400px', borderLeft: '6px solid #dc3545' }}>
+                    <div style={{ 
+                        ...modalContentStyle, 
+                        width: isMobile ? '90%' : '400px', 
+                        maxWidth: '400px', 
+                        borderLeft: '6px solid #dc3545',
+                        padding: isMobile ? '15px' : '25px'
+                    }}>
                         <h3 style={{ margin: '0 0 15px 0', color: '#dc3545' }}>¿Confirmar Eliminación?</h3>
                         <p style={{ fontSize: '14px', lineHeight: '1.5', margin: '0 0 15px 0', color: '#333' }}>
                             ¿Está seguro de que desea eliminar por completo el jabón <strong>{jabonAEliminar.nombre}</strong>?
@@ -1260,9 +1284,11 @@ const modalBackdropStyle = {
 
 const modalContentStyle = {
     backgroundColor: 'white',
-    padding: '30px',
+    padding: '25px',
     borderRadius: '12px',
-    width: '350px',
+    width: '90%',
+    maxWidth: '350px',
+    boxSizing: 'border-box',
     boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
     borderLeft: '6px solid #007bff',
     fontFamily: 'sans-serif'
