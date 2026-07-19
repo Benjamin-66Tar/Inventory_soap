@@ -3,9 +3,11 @@ import { useLocation } from 'react-router-dom';
 import api from './api/api';
 import FormularioJabon from './components/FormularioJabon';
 import { useAuth } from './context/AuthContext';
+import { useResponsive } from './context/ResponsiveContext';
 
 const Produccion = () => {
     const { role } = useAuth();
+    const { isMobile } = useResponsive();
     const location = useLocation();
     const [activeTab, setActiveTab] = useState('nueva_produccion');
 
@@ -429,7 +431,7 @@ const Produccion = () => {
     const unitSuffix = config ? config.unidad_peso : 'g';
 
     return (
-        <div style={panelContainerStyle}>
+        <div style={{ ...panelContainerStyle, padding: isMobile ? '10px' : '20px' }}>
             {/* Cabecera del Panel */}
             <div style={headerStyle}>
                 <h2>Módulo de Producción</h2>
@@ -437,7 +439,15 @@ const Produccion = () => {
             </div>
 
             {/* Pestañas Superiores Horizontales */}
-            <div style={tabContainerStyle}>
+            <div style={{ 
+                ...tabContainerStyle, 
+                overflowX: isMobile ? 'auto' : 'visible', 
+                whiteSpace: 'nowrap', 
+                WebkitOverflowScrolling: 'touch',
+                paddingBottom: isMobile ? '8px' : '0',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none'
+            }}>
                 <button
                     onClick={() => setActiveTab('nueva_produccion')}
                     style={tabButtonStyle(activeTab === 'nueva_produccion')}
@@ -513,25 +523,39 @@ const Produccion = () => {
                             Insumos consumidos {tipo === 'ESTANDAR' && '🔒 (Bloqueado por Receta)'}
                         </h3>
                         
-                        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px' }}>
-                            <thead>
-                                <tr style={{ textAlign: 'left', borderBottom: '2px solid #eee', color: '#666', fontSize: '14px' }}>
-                                    <th style={{ padding: '8px 0' }}>Insumo</th>
-                                    <th style={{ padding: '8px 0' }}>Cantidad ({unitSuffix})</th>
-                                    {tipo === 'EXPERIMENTO' && <th style={{ padding: '8px 0', textAlign: 'center' }}>Acciones</th>}
-                                </tr>
-                            </thead>
-                            <tbody>
+                        {isMobile ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
                                 {filasInsumos.map((fila, index) => (
-                                    <tr key={index}>
-                                        <td style={{ padding: '6px 0' }}>
+                                    <div key={index} style={{
+                                        backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: '8px',
+                                        padding: '12px',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '8px'
+                                    }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <span style={{ fontWeight: '600', fontSize: '14px', color: '#4b5563' }}>Insumo #{index + 1}</span>
+                                            {tipo === 'EXPERIMENTO' && filasInsumos.length > 1 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => eliminarFila(index)}
+                                                    style={{ backgroundColor: '#fee2e2', color: '#ef4444', border: '1px solid #fca5a5', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}
+                                                >
+                                                    ✕ Quitar
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Insumo</label>
                                             <select
                                                 value={fila.insumoId}
                                                 onChange={e => manejarCambioFila(index, 'insumoId', e.target.value)}
                                                 style={{ 
                                                     ...inputStyle, 
-                                                    width: '95%', 
-                                                    backgroundColor: tipo === 'ESTANDAR' ? '#f5f5f5' : 'white',
+                                                    width: '100%', 
+                                                    backgroundColor: tipo === 'ESTANDAR' ? '#f3f4f6' : 'white',
                                                     cursor: tipo === 'ESTANDAR' ? 'not-allowed' : 'default'
                                                 }}
                                                 disabled={tipo === 'ESTANDAR'}
@@ -544,8 +568,9 @@ const Produccion = () => {
                                                     </option>
                                                 ))}
                                             </select>
-                                        </td>
-                                        <td style={{ padding: '6px 0' }}>
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Cantidad ({unitSuffix})</label>
                                             <input
                                                 type="number"
                                                 step="any"
@@ -554,29 +579,83 @@ const Produccion = () => {
                                                 onChange={e => manejarCambioFila(index, 'cantidadReal', e.target.value)}
                                                 style={{ 
                                                     ...inputStyle, 
-                                                    width: '90%', 
-                                                    backgroundColor: tipo === 'ESTANDAR' ? '#f5f5f5' : 'white',
+                                                    width: '100%', 
+                                                    backgroundColor: tipo === 'ESTANDAR' ? '#f3f4f6' : 'white',
                                                     cursor: tipo === 'ESTANDAR' ? 'not-allowed' : 'text'
                                                 }}
                                                 disabled={tipo === 'ESTANDAR'}
                                                 required
                                             />
-                                        </td>
-                                        {tipo === 'EXPERIMENTO' && (
-                                            <td style={{ padding: '6px 0', textAlign: 'center' }}>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => eliminarFila(index)}
-                                                    style={{ backgroundColor: '#ff4d4d', color: 'white', border: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-                                                >
-                                                    X
-                                                </button>
-                                            </td>
-                                        )}
-                                    </tr>
+                                        </div>
+                                    </div>
                                 ))}
-                            </tbody>
-                        </table>
+                            </div>
+                        ) : (
+                            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px' }}>
+                                <thead>
+                                    <tr style={{ textAlign: 'left', borderBottom: '2px solid #eee', color: '#666', fontSize: '14px' }}>
+                                        <th style={{ padding: '8px 0' }}>Insumo</th>
+                                        <th style={{ padding: '8px 0' }}>Cantidad ({unitSuffix})</th>
+                                        {tipo === 'EXPERIMENTO' && <th style={{ padding: '8px 0', textAlign: 'center' }}>Acciones</th>}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filasInsumos.map((fila, index) => (
+                                        <tr key={index}>
+                                            <td style={{ padding: '6px 0' }}>
+                                                <select
+                                                    value={fila.insumoId}
+                                                    onChange={e => manejarCambioFila(index, 'insumoId', e.target.value)}
+                                                    style={{ 
+                                                        ...inputStyle, 
+                                                        width: '95%', 
+                                                        backgroundColor: tipo === 'ESTANDAR' ? '#f5f5f5' : 'white',
+                                                        cursor: tipo === 'ESTANDAR' ? 'not-allowed' : 'default'
+                                                    }}
+                                                    disabled={tipo === 'ESTANDAR'}
+                                                    required
+                                                >
+                                                    <option value="">Seleccionar...</option>
+                                                    {insumosDisponibles.map(ins => (
+                                                        <option key={ins.id} value={ins.id}>
+                                                            {ins.nombre} ({ins.cantidad_gramos}{unitSuffix} disp.)
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </td>
+                                            <td style={{ padding: '6px 0' }}>
+                                                <input
+                                                    type="number"
+                                                    step="any"
+                                                    placeholder="0.00"
+                                                    value={fila.cantidadReal}
+                                                    onChange={e => manejarCambioFila(index, 'cantidadReal', e.target.value)}
+                                                    style={{ 
+                                                        ...inputStyle, 
+                                                        width: '90%', 
+                                                        backgroundColor: tipo === 'ESTANDAR' ? '#f5f5f5' : 'white',
+                                                        cursor: tipo === 'ESTANDAR' ? 'not-allowed' : 'text'
+                                                    }}
+                                                    disabled={tipo === 'ESTANDAR'}
+                                                    required
+                                                />
+                                            </td>
+                                            {tipo === 'EXPERIMENTO' && (
+                                                <td style={{ padding: '6px 0', textAlign: 'center' }}>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => eliminarFila(index)}
+                                                        style={{ backgroundColor: '#ff4d4d', color: 'white', border: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+                                                    >
+                                                        X
+                                                    </button>
+                                                </td>
+                                            )}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
 
                         {/* Botón Añadir fila en Experimento */}
                         {tipo === 'EXPERIMENTO' && (
@@ -590,8 +669,8 @@ const Produccion = () => {
                         )}
 
                         {/* Unidades y Notas */}
-                        <div style={{ marginTop: '20px', display: 'flex', gap: '20px' }}>
-                            <div style={{ width: '220px' }}>
+                        <div style={{ marginTop: '20px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '15px' : '20px' }}>
+                            <div style={{ width: isMobile ? '100%' : '220px' }}>
                                 <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '5px' }}>Unidades Resultantes:</label>
                                 <input
                                     type="number"
@@ -685,37 +764,39 @@ const Produccion = () => {
                     </div>
                     <p style={descriptionStyle}>Configura los insumos base requeridos para fabricar lotes de jabón estándar.</p>
                     
-                    <table border="1" cellPadding="10" style={tableStyle}>
-                        <thead>
-                            <tr style={{ backgroundColor: '#f9fafb' }}>
-                                <th style={{ width: '45%', textAlign: 'left' }}>Jabón</th>
-                                <th style={{ width: '25%', textAlign: 'left' }}>Lote Base</th>
-                                <th style={{ width: '30%', textAlign: 'center' }}>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {recetas.length > 0 ? (
-                                recetas.map(rec => (
-                                    <tr key={rec.id}>
-                                        <td style={{ fontWeight: '500' }}>{rec.jabon_nombre}</td>
-                                        <td>{rec.cantidad_piezas_base} piezas</td>
-                                        <td style={{ textAlign: 'center' }}>
-                                            <button onClick={() => abrirEditarReceta(rec)} style={editBtnStyle}>
-                                                Editar ✏️
-                                            </button>
-                                            <button onClick={() => eliminarReceta(rec.id, rec.jabon_nombre)} style={deleteBtnStyle}>
-                                                Eliminar 🗑️
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="3" style={{ textAlign: 'center', color: '#999' }}>No hay recetas configuradas.</td>
+                    <div style={{ overflowX: 'auto', width: '100%', WebkitOverflowScrolling: 'touch' }}>
+                        <table border="1" cellPadding="10" style={tableStyle}>
+                            <thead>
+                                <tr style={{ backgroundColor: '#f9fafb' }}>
+                                    <th style={{ width: '45%', textAlign: 'left' }}>Jabón</th>
+                                    <th style={{ width: '25%', textAlign: 'left' }}>Lote Base</th>
+                                    <th style={{ width: '30%', textAlign: 'center' }}>Acciones</th>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {recetas.length > 0 ? (
+                                    recetas.map(rec => (
+                                        <tr key={rec.id}>
+                                            <td style={{ fontWeight: '500' }}>{rec.jabon_nombre}</td>
+                                            <td>{rec.cantidad_piezas_base} piezas</td>
+                                            <td style={{ textAlign: 'center' }}>
+                                                <button onClick={() => abrirEditarReceta(rec)} style={editBtnStyle}>
+                                                    Editar ✏️
+                                                </button>
+                                                <button onClick={() => eliminarReceta(rec.id, rec.jabon_nombre)} style={deleteBtnStyle}>
+                                                    Eliminar 🗑️
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="3" style={{ textAlign: 'center', color: '#999' }}>No hay recetas configuradas.</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
 
@@ -730,35 +811,37 @@ const Produccion = () => {
                     </div>
                     <p style={descriptionStyle}>Administra las categorías de jabones que se asocian al dar de alta perfiles de producto.</p>
                     
-                    <table border="1" cellPadding="10" style={tableStyle}>
-                        <thead>
-                            <tr style={{ backgroundColor: '#f9fafb' }}>
-                                <th style={{ width: '70%', textAlign: 'left' }}>Nombre de la Categoría</th>
-                                <th style={{ width: '30%', textAlign: 'center' }}>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {categorias.length > 0 ? (
-                                categorias.map(cat => (
-                                    <tr key={cat.id}>
-                                        <td style={{ fontWeight: '500' }}>{cat.nombre}</td>
-                                        <td style={{ textAlign: 'center' }}>
-                                            <button onClick={() => abrirEditar(cat)} style={editBtnStyle}>
-                                                Editar ✏️
-                                            </button>
-                                            <button onClick={() => eliminarCategoria(cat.id, cat.nombre)} style={deleteBtnStyle}>
-                                                Eliminar 🗑️
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="2" style={{ textAlign: 'center', color: '#999' }}>No hay categorías registradas.</td>
+                    <div style={{ overflowX: 'auto', width: '100%', WebkitOverflowScrolling: 'touch' }}>
+                        <table border="1" cellPadding="10" style={tableStyle}>
+                            <thead>
+                                <tr style={{ backgroundColor: '#f9fafb' }}>
+                                    <th style={{ width: '70%', textAlign: 'left' }}>Nombre de la Categoría</th>
+                                    <th style={{ width: '30%', textAlign: 'center' }}>Acciones</th>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {categorias.length > 0 ? (
+                                    categorias.map(cat => (
+                                        <tr key={cat.id}>
+                                            <td style={{ fontWeight: '500' }}>{cat.nombre}</td>
+                                            <td style={{ textAlign: 'center' }}>
+                                                <button onClick={() => abrirEditar(cat)} style={editBtnStyle}>
+                                                    Editar ✏️
+                                                </button>
+                                                <button onClick={() => eliminarCategoria(cat.id, cat.nombre)} style={deleteBtnStyle}>
+                                                    Eliminar 🗑️
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="2" style={{ textAlign: 'center', color: '#999' }}>No hay categorías registradas.</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
 
@@ -775,39 +858,41 @@ const Produccion = () => {
                         Consulte y gestione los perfiles de jabones registrados. <strong>Nota:</strong> Al eliminar un tipo de jabón, se borrarán en cascada todos sus registros de producción, recetas y salidas de stock asociadas.
                     </p>
                     
-                    <table border="1" cellPadding="10" style={tableStyle}>
-                        <thead>
-                            <tr style={{ backgroundColor: '#f9fafb' }}>
-                                <th style={{ width: '40%', textAlign: 'left' }}>Nombre del Jabón</th>
-                                <th style={{ width: '25%', textAlign: 'left' }}>Categoría</th>
-                                <th style={{ width: '15%', textAlign: 'center' }}>Stock (Piezas)</th>
-                                <th style={{ width: '20%', textAlign: 'center' }}>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {jabones.length > 0 ? (
-                                jabones.map(j => (
-                                    <tr key={j.id}>
-                                        <td style={{ fontWeight: '500' }}>{j.nombre}</td>
-                                        <td>{j.categoria_nombre || 'Sin Categoría'}</td>
-                                        <td style={{ textAlign: 'center' }}>{j.cantidad}</td>
-                                        <td style={{ textAlign: 'center' }}>
-                                            <button 
-                                                onClick={() => iniciarEliminarJabon(j)} 
-                                                style={deleteBtnStyle}
-                                            >
-                                                Eliminar 🗑️
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="4" style={{ textAlign: 'center', color: '#999' }}>No hay jabones registrados en el catálogo.</td>
+                    <div style={{ overflowX: 'auto', width: '100%', WebkitOverflowScrolling: 'touch' }}>
+                        <table border="1" cellPadding="10" style={tableStyle}>
+                            <thead>
+                                <tr style={{ backgroundColor: '#f9fafb' }}>
+                                    <th style={{ width: '40%', textAlign: 'left' }}>Nombre del Jabón</th>
+                                    <th style={{ width: '25%', textAlign: 'left' }}>Categoría</th>
+                                    <th style={{ width: '15%', textAlign: 'center' }}>Stock (Piezas)</th>
+                                    <th style={{ width: '20%', textAlign: 'center' }}>Acciones</th>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {jabones.length > 0 ? (
+                                    jabones.map(j => (
+                                        <tr key={j.id}>
+                                            <td style={{ fontWeight: '500' }}>{j.nombre}</td>
+                                            <td>{j.categoria_nombre || 'Sin Categoría'}</td>
+                                            <td style={{ textAlign: 'center' }}>{j.cantidad}</td>
+                                            <td style={{ textAlign: 'center' }}>
+                                                <button 
+                                                    onClick={() => iniciarEliminarJabon(j)} 
+                                                    style={deleteBtnStyle}
+                                                >
+                                                    Eliminar 🗑️
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="4" style={{ textAlign: 'center', color: '#999' }}>No hay jabones registrados en el catálogo.</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
 
@@ -1085,16 +1170,18 @@ const tabContainerStyle = {
 };
 
 const tabButtonStyle = (isActive) => ({
-    padding: '12px 24px',
+    padding: '12px 20px',
     border: 'none',
     borderBottom: isActive ? '3px solid #007bff' : '3px solid transparent',
     backgroundColor: 'transparent',
     color: isActive ? '#007bff' : '#555',
     fontWeight: 'bold',
-    fontSize: '15px',
+    fontSize: '14px',
     cursor: 'pointer',
     transition: 'all 0.2s ease-in-out',
-    outline: 'none'
+    outline: 'none',
+    flexShrink: 0,
+    whiteSpace: 'nowrap'
 });
 
 const sectionTitleStyle = {
