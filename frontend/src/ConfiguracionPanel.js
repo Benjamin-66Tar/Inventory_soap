@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import api from './api/api';
+import { useResponsive } from './context/ResponsiveContext';
 
 const ConfiguracionPanel = () => {
+    const { isMobile } = useResponsive();
     const [activeTab, setActiveTab] = useState('general'); // Pestañas: 'general', 'admin_usuarios', 'admin_bitacora', 'admin_reglas', 'admin_datos'
     const [config, setConfig] = useState({
         unidad_peso: 'g',
@@ -255,50 +257,107 @@ const ConfiguracionPanel = () => {
             )}
 
             {/* Cuerpo del Panel con Menú de Navegación Lateral */}
-            <div style={bodyLayoutStyle}>
+            <div style={{
+                ...bodyLayoutStyle,
+                flexDirection: isMobile ? 'column' : 'row',
+                gap: isMobile ? '15px' : '30px',
+                alignItems: 'stretch'
+            }}>
                 {/* Menú de Pestañas Izquierdo */}
-                <div style={sidebarStyle}>
-                    <button
-                        onClick={() => setActiveTab('general')}
-                        style={sidebarButtonStyle(activeTab === 'general')}
-                    >
-                        ⚙️ Preferencias Generales
-                    </button>
-                    
-                    <div style={adminHeaderStyle}>
-                        🛡️ Panel de Administración
-                    </div>
-                    
-                    <div style={subTabContainerStyle}>
+                {isMobile ? (
+                    <div style={{
+                        display: 'flex',
+                        gap: '10px',
+                        overflowX: 'auto',
+                        whiteSpace: 'nowrap',
+                        WebkitOverflowScrolling: 'touch',
+                        borderBottom: '1px solid #1f2937',
+                        paddingBottom: '10px',
+                        marginBottom: '15px',
+                        scrollbarWidth: 'none',
+                        msOverflowStyle: 'none'
+                    }}>
+                        <button
+                            onClick={() => setActiveTab('general')}
+                            style={mobileChipStyle(activeTab === 'general')}
+                        >
+                            ⚙️ General
+                        </button>
                         <button
                             onClick={() => setActiveTab('admin_usuarios')}
-                            style={subSidebarButtonStyle(activeTab === 'admin_usuarios')}
+                            style={mobileChipStyle(activeTab === 'admin_usuarios')}
                         >
-                            👥 Usuarios y Roles
+                            👥 Usuarios
                         </button>
                         <button
                             onClick={() => setActiveTab('admin_bitacora')}
-                            style={subSidebarButtonStyle(activeTab === 'admin_bitacora')}
+                            style={mobileChipStyle(activeTab === 'admin_bitacora')}
                         >
-                            📋 Bitácora de Sistema
+                            📋 Bitácora
                         </button>
                         <button
                             onClick={() => setActiveTab('admin_reglas')}
-                            style={subSidebarButtonStyle(activeTab === 'admin_reglas')}
+                            style={mobileChipStyle(activeTab === 'admin_reglas')}
                         >
-                            🚨 Reglas de Inventario
+                            🚨 Reglas
                         </button>
                         <button
                             onClick={() => setActiveTab('admin_datos')}
-                            style={subSidebarButtonStyle(activeTab === 'admin_datos')}
+                            style={mobileChipStyle(activeTab === 'admin_datos')}
                         >
-                            💾 Datos y Respaldo
+                            💾 Respaldo
                         </button>
                     </div>
-                </div>
+                ) : (
+                    <div style={sidebarStyle}>
+                        <button
+                            onClick={() => setActiveTab('general')}
+                            style={sidebarButtonStyle(activeTab === 'general')}
+                        >
+                            ⚙️ Preferencias Generales
+                        </button>
+                        
+                        <div style={adminHeaderStyle}>
+                            🛡️ Panel de Administración
+                        </div>
+                        
+                        <div style={subTabContainerStyle}>
+                            <button
+                                onClick={() => setActiveTab('admin_usuarios')}
+                                style={subSidebarButtonStyle(activeTab === 'admin_usuarios')}
+                            >
+                                👥 Usuarios y Roles
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('admin_bitacora')}
+                                style={subSidebarButtonStyle(activeTab === 'admin_bitacora')}
+                            >
+                                📋 Bitácora de Sistema
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('admin_reglas')}
+                                style={subSidebarButtonStyle(activeTab === 'admin_reglas')}
+                            >
+                                🚨 Reglas de Inventario
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('admin_datos')}
+                                style={subSidebarButtonStyle(activeTab === 'admin_datos')}
+                            >
+                                💾 Datos y Respaldo
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 {/* Área de Contenido Derecho */}
-                <div style={contentAreaStyle}>
+                <div style={{
+                    ...contentAreaStyle,
+                    padding: isMobile ? '15px' : '30px',
+                    minHeight: isMobile ? 'auto' : '500px',
+                    width: '100%',
+                    boxSizing: 'border-box'
+                }}>
                     
                     {/* pestaña: GENERAL */}
                     {activeTab === 'general' && (
@@ -437,97 +496,101 @@ const ConfiguracionPanel = () => {
                             {invitaciones.length > 0 && (
                                 <div style={{ marginTop: '25px' }}>
                                     <h4 style={{ margin: '0 0 10px 0', color: '#ffffff' }}>Invitaciones Pendientes</h4>
-                                    <table style={tableStyle}>
-                                        <thead>
-                                            <tr style={tableHeaderRowStyle}>
-                                                <th style={tableHeaderStyle}>Email</th>
-                                                <th style={tableHeaderStyle}>Rol Asignado</th>
-                                                <th style={tableHeaderStyle}>Expiración</th>
-                                                <th style={tableHeaderStyle}>Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {invitaciones.map(inv => (
-                                                <tr key={inv.id} style={tableRowStyle}>
-                                                    <td style={tableCellStyle}>{inv.email}</td>
-                                                    <td style={tableCellStyle}>
-                                                        <span style={badgeStyle('#60a5fa', 'rgba(96,165,250,0.15)')}>
-                                                            {inv.rol === 'ADMIN' ? 'Administrador' : inv.rol === 'SUPERVISOR' ? 'Supervisor' : 'Operador'}
-                                                        </span>
-                                                    </td>
-                                                    <td style={tableCellStyle}>{new Date(inv.expires_at).toLocaleString()}</td>
-                                                    <td style={tableCellStyle}>
-                                                        <button 
-                                                            style={actionButtonStyle(true)}
-                                                            onClick={() => handleEliminarInvitacion(inv.id)}
-                                                        >
-                                                            Eliminar
-                                                        </button>
-                                                    </td>
+                                    <div style={{ overflowX: 'auto', width: '100%', WebkitOverflowScrolling: 'touch' }}>
+                                        <table style={tableStyle}>
+                                            <thead>
+                                                <tr style={tableHeaderRowStyle}>
+                                                    <th style={tableHeaderStyle}>Email</th>
+                                                    <th style={tableHeaderStyle}>Rol Asignado</th>
+                                                    <th style={tableHeaderStyle}>Expiración</th>
+                                                    <th style={tableHeaderStyle}>Acciones</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                {invitaciones.map(inv => (
+                                                    <tr key={inv.id} style={tableRowStyle}>
+                                                        <td style={tableCellStyle}>{inv.email}</td>
+                                                        <td style={tableCellStyle}>
+                                                            <span style={badgeStyle('#60a5fa', 'rgba(96,165,250,0.15)')}>
+                                                                {inv.rol === 'ADMIN' ? 'Administrador' : inv.rol === 'SUPERVISOR' ? 'Supervisor' : 'Operador'}
+                                                            </span>
+                                                        </td>
+                                                        <td style={tableCellStyle}>{new Date(inv.expires_at).toLocaleString()}</td>
+                                                        <td style={tableCellStyle}>
+                                                            <button 
+                                                                style={actionButtonStyle(true)}
+                                                                onClick={() => handleEliminarInvitacion(inv.id)}
+                                                            >
+                                                                Eliminar
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             )}
 
                             {/* Usuarios Activos */}
                             <div style={{ marginTop: '25px' }}>
                                 <h4 style={{ margin: '0 0 10px 0', color: '#ffffff' }}>Colaboradores del Sistema</h4>
-                                <table style={tableStyle}>
-                                    <thead>
-                                        <tr style={tableHeaderRowStyle}>
-                                            <th style={tableHeaderStyle}>Usuario</th>
-                                            <th style={tableHeaderStyle}>Email</th>
-                                            <th style={tableHeaderStyle}>Nombre Completo</th>
-                                            <th style={tableHeaderStyle}>Rol</th>
-                                            <th style={tableHeaderStyle}>Estado</th>
-                                            <th style={tableHeaderStyle}>Acción</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {usuarios.map(u => {
-                                            const uRol = u.rol || 'OPERADOR';
-                                            return (
-                                                <tr key={u.id} style={tableRowStyle}>
-                                                    <td style={tableCellStyle}>{u.username}</td>
-                                                    <td style={tableCellStyle}>{u.email}</td>
-                                                    <td style={tableCellStyle}>{u.first_name} {u.last_name}</td>
-                                                    <td style={tableCellStyle}>
-                                                        <select
-                                                            value={uRol}
-                                                            onChange={e => handleCambiarRol(u.id, e.target.value)}
-                                                            style={selectInlineStyle}
-                                                        >
-                                                            <option value="OPERADOR">Operador</option>
-                                                            <option value="SUPERVISOR">Supervisor</option>
-                                                            <option value="ADMIN">Administrador</option>
-                                                        </select>
-                                                    </td>
-                                                    <td style={tableCellStyle}>
-                                                        <span style={badgeStyle(u.is_active ? '#34d399' : '#f87171', u.is_active ? 'rgba(52,211,153,0.15)' : 'rgba(248,113,113,0.15)')}>
-                                                            {u.is_active ? 'Activo' : 'Suspendido'}
-                                                        </span>
-                                                    </td>
-                                                    <td style={{ ...tableCellStyle, display: 'flex', gap: '8px' }}>
-                                                        <button 
-                                                            style={changePasswordBtnStyle}
-                                                            onClick={() => abrirModalPassword(u)}
-                                                        >
-                                                            🔑 Clave
-                                                        </button>
-                                                        <button 
-                                                            style={actionButtonStyle(false, u.is_active)}
-                                                            onClick={() => handleCambiarEstado(u.id, u.is_active)}
-                                                        >
-                                                            {u.is_active ? 'Suspender' : 'Activar'}
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
+                                <div style={{ overflowX: 'auto', width: '100%', WebkitOverflowScrolling: 'touch' }}>
+                                    <table style={tableStyle}>
+                                        <thead>
+                                            <tr style={tableHeaderRowStyle}>
+                                                <th style={tableHeaderStyle}>Usuario</th>
+                                                <th style={tableHeaderStyle}>Email</th>
+                                                <th style={tableHeaderStyle}>Nombre Completo</th>
+                                                <th style={tableHeaderStyle}>Rol</th>
+                                                <th style={tableHeaderStyle}>Estado</th>
+                                                <th style={tableHeaderStyle}>Acción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {usuarios.map(u => {
+                                                const uRol = u.rol || 'OPERADOR';
+                                                return (
+                                                    <tr key={u.id} style={tableRowStyle}>
+                                                        <td style={tableCellStyle}>{u.username}</td>
+                                                        <td style={tableCellStyle}>{u.email}</td>
+                                                        <td style={tableCellStyle}>{u.first_name} {u.last_name}</td>
+                                                        <td style={tableCellStyle}>
+                                                            <select
+                                                                value={uRol}
+                                                                onChange={e => handleCambiarRol(u.id, e.target.value)}
+                                                                style={selectInlineStyle}
+                                                            >
+                                                                <option value="OPERADOR">Operador</option>
+                                                                <option value="SUPERVISOR">Supervisor</option>
+                                                                <option value="ADMIN">Administrador</option>
+                                                            </select>
+                                                        </td>
+                                                        <td style={tableCellStyle}>
+                                                            <span style={badgeStyle(u.is_active ? '#34d399' : '#f87171', u.is_active ? 'rgba(52,211,153,0.15)' : 'rgba(248,113,113,0.15)')}>
+                                                                {u.is_active ? 'Activo' : 'Suspendido'}
+                                                            </span>
+                                                        </td>
+                                                        <td style={{ ...tableCellStyle, display: 'flex', gap: '8px' }}>
+                                                            <button 
+                                                                style={changePasswordBtnStyle}
+                                                                onClick={() => abrirModalPassword(u)}
+                                                            >
+                                                                🔑 Clave
+                                                            </button>
+                                                            <button 
+                                                                style={actionButtonStyle(false, u.is_active)}
+                                                                onClick={() => handleCambiarEstado(u.id, u.is_active)}
+                                                            >
+                                                                {u.is_active ? 'Suspender' : 'Activar'}
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -819,6 +882,20 @@ const subSidebarButtonStyle = (isActive) => ({
     cursor: 'pointer',
     transition: 'all 0.2s',
     fontSize: '13.5px'
+});
+
+const mobileChipStyle = (isActive) => ({
+    padding: '8px 14px',
+    borderRadius: '20px',
+    border: '1px solid ' + (isActive ? '#3b82f6' : '#1f2937'),
+    backgroundColor: isActive ? '#3b82f6' : '#111827',
+    color: isActive ? '#ffffff' : '#9ca3af',
+    fontWeight: '600',
+    cursor: 'pointer',
+    fontSize: '13px',
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
+    transition: 'all 0.2s'
 });
 
 const contentAreaStyle = {
