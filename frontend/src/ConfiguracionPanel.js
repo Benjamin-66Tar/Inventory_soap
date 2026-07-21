@@ -237,9 +237,9 @@ const ConfiguracionPanel = () => {
     return (
         <div style={panelContainerStyle}>
             {/* Cabecera del Panel */}
-            <div style={headerStyle}>
-                <h2>⚙️ Configuración del Sistema</h2>
-                <p style={{ margin: 0, color: '#9ca3af' }}>Personaliza los parámetros globales de la aplicación y gestiona el Panel de Administración.</p>
+            <div style={{ ...headerStyle, borderBottom: '1px solid #e5e7eb' }}>
+                <h2 style={{ color: '#111827', margin: '0 0 8px 0' }}>⚙️ Configuración del Sistema</h2>
+                <p style={{ margin: 0, color: '#4b5563' }}>Personaliza los parámetros globales de la aplicación y gestiona el Panel de Administración.</p>
             </div>
 
             {/* Mensajes de feedback */}
@@ -688,7 +688,12 @@ const ConfiguracionPanel = () => {
                             <h3 style={sectionTitleStyle}>💾 Datos y Respaldo</h3>
                             <p style={descriptionStyle}>Gestiona copias de seguridad de la base de datos de SoapManager en formato JSON para prevenir pérdidas o migrar de equipo.</p>
                             
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '25px' }}>
+                            <div style={{ 
+                                display: 'grid', 
+                                gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', 
+                                gap: '20px', 
+                                marginTop: '25px' 
+                            }}>
                                 
                                 {/* Exportar */}
                                 <div style={cardStyle}>
@@ -974,7 +979,9 @@ const fileInputStyle = {
     color: '#9ca3af',
     fontSize: '13px',
     outline: 'none',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    width: '100%',
+    boxSizing: 'border-box'
 };
 
 const radioContainerStyle = {
