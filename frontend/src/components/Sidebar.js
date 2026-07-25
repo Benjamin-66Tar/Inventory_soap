@@ -6,6 +6,7 @@ import { useResponsive } from '../context/ResponsiveContext';
 import blueSoap from '../blue_soap_transparent.png';
 
 const emojiMap = {
+  Dashboard: '📊',
   Soap: '🧼',
   Factory: '🏭',
   HourglassEmpty: '⏳',

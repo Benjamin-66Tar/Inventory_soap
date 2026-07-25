@@ -15,6 +15,7 @@ import Produccion from './Produccion';
 import HistorialProduccion from './Historial/HistorialProduccion';
 import Curado from './Curado';
 import ConfiguracionPanel from './ConfiguracionPanel';
+import Dashboard from './Dashboard';
 
 function App() {
   return (
@@ -37,8 +38,17 @@ function App() {
                   </ProtectedRoute>
                 }
               >
-                {/* Redirección automática al inventario al entrar a la app */}
-                <Route index element={<Navigate to="/inventario" replace />} />
+                {/* Redirección automática al Dashboard al entrar a la app */}
+                <Route index element={<Dashboard />} />
+
+                <Route 
+                  path="dashboard" 
+                  element={
+                    <ProtectedRoute allowedRoles={['ADMIN', 'SUPERVISOR', 'OPERADOR']}>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  } 
+                />
 
                 <Route 
                   path="inventario" 
