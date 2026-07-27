@@ -9,6 +9,8 @@ class Insumos(models.Model):
     cantidad_gramos = models.FloatField(validators=[MinValueValidator(0.0)])
     proveedor = models.CharField(max_length=100)
     fecha_ingreso = models.DateField()
+    umbral_advertencia = models.FloatField(default=100.0, validators=[MinValueValidator(0.0)])
+    umbral_critico = models.FloatField(default=50.0, validators=[MinValueValidator(0.0)])
 
     def __str__(self):
         #Se mostrar el archivo administrador de Django y otros lugares

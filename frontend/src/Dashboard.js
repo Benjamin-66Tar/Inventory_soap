@@ -37,7 +37,10 @@ const Dashboard = () => {
                 // Cargar Insumos
                 const resInsumos = await api.get('/insumos/').catch(() => ({ data: [] }));
                 const insumosData = Array.isArray(resInsumos.data) ? resInsumos.data : (resInsumos.data.results || []);
-                const insumosCriticos = insumosData.filter(ins => (parseFloat(ins.cantidad_gramos) || 0) <= umbral);
+                const insumosCriticos = insumosData.filter(ins => {
+                    const crit = ins.umbral_critico !== undefined ? ins.umbral_critico : umbral;
+                    return (parseFloat(ins.cantidad_gramos) || 0) <= crit;
+                });
 
                 // Cargar Lotes en Curado
                 const resProduccion = await api.get('/produccion/').catch(() => ({ data: [] }));

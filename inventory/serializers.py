@@ -8,7 +8,7 @@ class InsumoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Insumos
         #Aquí defines que datos quieres enviar a react
-        fields = ['id', 'nombre', 'cantidad_gramos', 'proveedor', 'fecha_ingreso']
+        fields = ['id', 'nombre', 'cantidad_gramos', 'proveedor', 'fecha_ingreso', 'umbral_advertencia', 'umbral_critico']
 
     def validate_nombre(self, value):
         nombre_limpio = value.strip()

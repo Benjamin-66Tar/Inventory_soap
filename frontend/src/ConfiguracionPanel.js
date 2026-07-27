@@ -22,6 +22,11 @@ const ConfiguracionPanel = () => {
     const [bitacora, setBitacora] = useState([]);
     const [searchBitacora, setSearchBitacora] = useState('');
 
+    // Estado de Reglas de Inventario e Insumos
+    const [insumosReglas, setInsumosReglas] = useState([]);
+    const [recetasList, setRecetasList] = useState([]);
+    const [guardandoUmbrales, setGuardandoUmbrales] = useState(false);
+
     // Archivo de Respaldo
     const [backupFile, setBackupFile] = useState(null);
 
@@ -48,6 +53,8 @@ const ConfiguracionPanel = () => {
             cargarInvitaciones();
         } else if (activeTab === 'admin_bitacora') {
             cargarBitacora();
+        } else if (activeTab === 'admin_reglas') {
+            cargarInsumosYRecetas();
         }
         setMessage('');
         setError('');
@@ -76,6 +83,110 @@ const ConfiguracionPanel = () => {
         api.get(`/admin/bitacora/${query}`)
             .then(res => setBitacora(res.data))
             .catch(err => console.error("Error al cargar bitácora:", err));
+    };
+
+    const cargarInsumosYRecetas = async () => {
+        try {
+            const [resIns, resRec] = await Promise.all([
+                api.get('/insumos/'),
+                api.get('/recetas/')
+            ]);
+            const insData = Array.isArray(resIns.data) ? resIns.data : (resIns.data.results || []);
+            const recData = Array.isArray(resRec.data) ? resRec.data : (resRec.data.results || []);
+            
+            const insumosMap = insData.map(ins => ({
+                ...ins,
+                umbral_advertencia: ins.umbral_advertencia !== undefined ? ins.umbral_advertencia : 100,
+                umbral_critico: ins.umbral_critico !== undefined ? ins.umbral_critico : 50
+            }));
+            setInsumosReglas(insumosMap);
+            setRecetasList(recData);
+        } catch (err) {
+            console.error("Error al cargar insumos y recetas para reglas:", err);
+        }
+    };
+
+    const handleAutoCalcularUmbrales = () => {
+        if (recetasList.length === 0) {
+            alert("No hay recetas de producción configuradas para realizar el cálculo automático.");
+            return;
+        }
+
+        const consumoMaxPorInsumo = {};
+        recetasList.forEach(rec => {
+            if (rec.ingredientes && Array.isArray(rec.ingredientes)) {
+                rec.ingredientes.forEach(ing => {
+                    const insId = ing.insumo;
+                    const cant = parseFloat(ing.cantidad_base) || 0;
+                    if (!consumoMaxPorInsumo[insId] || cant > consumoMaxPorInsumo[insId]) {
+                        consumoMaxPorInsumo[insId] = cant;
+                    }
+                });
+            }
+        });
+
+        const nuevosInsumos = insumosReglas.map(ins => {
+            const maxCantBase = consumoMaxPorInsumo[ins.id];
+            if (maxCantBase && maxCantBase > 0) {
+                return {
+                    ...ins,
+                    umbral_critico: parseFloat(maxCantBase.toFixed(2)),
+                    umbral_advertencia: parseFloat((maxCantBase * 2).toFixed(2))
+                };
+            } else {
+                return {
+                    ...ins,
+                    umbral_critico: 50,
+                    umbral_advertencia: 100
+                };
+            }
+        });
+
+        setInsumosReglas(nuevosInsumos);
+        setMessage("✨ Umbrales auto-calculados según tus recetas oficiales. Revisa los valores y pulsa 'Guardar Todos los Umbrales'.");
+    };
+
+    const handleCambioUmbralInsumo = (id, campo, valor) => {
+        setInsumosReglas(prev => prev.map(ins => {
+            if (ins.id === id) {
+                return { ...ins, [campo]: valor };
+            }
+            return ins;
+        }));
+    };
+
+    const handleGuardarTodosUmbrales = async () => {
+        setGuardandoUmbrales(true);
+        setMessage('');
+        setError('');
+        try {
+            await Promise.all(insumosReglas.map(ins => 
+                api.patch(`/insumos/${ins.id}/`, {
+                    umbral_advertencia: parseFloat(ins.umbral_advertencia) || 0,
+                    umbral_critico: parseFloat(ins.umbral_critico) || 0
+                })
+            ));
+            setMessage("✅ Umbrales de stock 'Poco' y 'Punto Crítico' guardados con éxito.");
+        } catch (err) {
+            console.error("Error al guardar umbrales:", err);
+            setError("Error al actualizar los umbrales de inventario.");
+        } finally {
+            setGuardandoUmbrales(false);
+        }
+    };
+
+    const getEstadoSemaforoInsumo = (ins) => {
+        const cant = parseFloat(ins.cantidad_gramos) || 0;
+        const adv = parseFloat(ins.umbral_advertencia) || 100;
+        const crit = parseFloat(ins.umbral_critico) || 50;
+
+        if (cant <= crit) {
+            return { label: '🔴 Punto Crítico', bg: 'rgba(239, 68, 68, 0.2)', color: '#f87171' };
+        } else if (cant <= adv) {
+            return { label: '🟡 Poco (Advertencia)', bg: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24' };
+        } else {
+            return { label: '🟢 Óptimo', bg: 'rgba(16, 185, 129, 0.2)', color: '#34d399' };
+        }
     };
 
     const guardarPreferencias = async (e) => {
@@ -657,14 +768,213 @@ const ConfiguracionPanel = () => {
                     {/* pestaña: REGLAS DE INVENTARIO */}
                     {activeTab === 'admin_reglas' && (
                         <div>
-                            <h3 style={sectionTitleStyle}>🚨 Reglas de Inventario y Alertas</h3>
-                            
-                            <div style={cardStyle}>
-                                <h4 style={{ margin: '0 0 10px 0', color: '#ffffff' }}>Alertas de Reabastecimiento Crítico</h4>
-                                <p style={descriptionStyle}>Cuando las existencias de un insumo o jabón curado caigan por debajo del <strong>umbral crítico</strong> de stock (actualmente establecido en: <strong>{config.umbral_critico_stock}</strong>), el sistema mostrará alertas visuales rojas destacadas en las tablas de inventario.</p>
+                            <h3 style={sectionTitleStyle}>🚨 Reglas de Inventario y Umbrales Personalizados</h3>
+                            <p style={descriptionStyle}>
+                                Configura los límites de <strong>Poco (Advertencia 🟡)</strong> y <strong>Punto Crítico (Urgencia 🔴)</strong> de cada insumo según su escala de uso en tus recetas.
+                            </p>
+
+                            {/* Barra de Acciones y Auto-Cálculo */}
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                gap: '15px',
+                                flexWrap: 'wrap',
+                                backgroundColor: '#1f2937',
+                                padding: '16px',
+                                borderRadius: '10px',
+                                border: '1px solid #374151',
+                                marginBottom: '20px'
+                            }}>
+                                <button
+                                    type="button"
+                                    onClick={handleAutoCalcularUmbrales}
+                                    style={{
+                                        backgroundColor: '#8b5cf6',
+                                        color: 'white',
+                                        border: 'none',
+                                        padding: '10px 18px',
+                                        borderRadius: '8px',
+                                        cursor: 'pointer',
+                                        fontWeight: '600',
+                                        fontSize: '13px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px'
+                                    }}
+                                >
+                                    🪄 Auto-calcular umbrales con mis Recetas
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleGuardarTodosUmbrales}
+                                    disabled={guardandoUmbrales}
+                                    style={{
+                                        backgroundColor: '#10b981',
+                                        color: 'white',
+                                        border: 'none',
+                                        padding: '10px 20px',
+                                        borderRadius: '8px',
+                                        cursor: 'pointer',
+                                        fontWeight: '600',
+                                        fontSize: '14px',
+                                        boxShadow: '0 4px 10px rgba(16, 185, 129, 0.2)'
+                                    }}
+                                >
+                                    {guardandoUmbrales ? 'Guardando...' : '💾 Guardar Todos los Umbrales'}
+                                </button>
                             </div>
 
-                            <div style={{ ...cardStyle, marginTop: '20px' }}>
+                            {/* Tabla o Tarjetas de Umbrales por Insumo */}
+                            {isMobile ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '25px' }}>
+                                    {insumosReglas.map(ins => {
+                                        const semaforo = getEstadoSemaforoInsumo(ins);
+                                        return (
+                                            <div key={ins.id} style={{
+                                                backgroundColor: '#1f2937',
+                                                border: '1px solid #374151',
+                                                borderRadius: '10px',
+                                                padding: '14px',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                gap: '10px'
+                                            }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <span style={{ fontWeight: '700', color: '#ffffff', fontSize: '15px' }}>{ins.nombre}</span>
+                                                    <span style={{
+                                                        backgroundColor: semaforo.bg,
+                                                        color: semaforo.color,
+                                                        padding: '4px 10px',
+                                                        borderRadius: '12px',
+                                                        fontSize: '11px',
+                                                        fontWeight: '700'
+                                                    }}>
+                                                        {semaforo.label}
+                                                    </span>
+                                                </div>
+                                                <div style={{ fontSize: '13px', color: '#9ca3af' }}>
+                                                    Stock Actual: <strong style={{ color: '#ffffff' }}>{ins.cantidad_gramos} ({config.unidad_peso})</strong>
+                                                </div>
+                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                                                    <div>
+                                                        <label style={{ display: 'block', fontSize: '11px', color: '#fbbf24', marginBottom: '4px', fontWeight: '600' }}>🟡 Poco ({config.unidad_peso})</label>
+                                                        <input
+                                                            type="number"
+                                                            step="any"
+                                                            value={ins.umbral_advertencia}
+                                                            onChange={e => handleCambioUmbralInsumo(ins.id, 'umbral_advertencia', e.target.value)}
+                                                            style={{
+                                                                width: '100%',
+                                                                padding: '8px',
+                                                                backgroundColor: '#111827',
+                                                                border: '1px solid #374151',
+                                                                borderRadius: '6px',
+                                                                color: '#ffffff',
+                                                                fontSize: '13px',
+                                                                boxSizing: 'border-box'
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label style={{ display: 'block', fontSize: '11px', color: '#f87171', marginBottom: '4px', fontWeight: '600' }}>🔴 Punto Crítico ({config.unidad_peso})</label>
+                                                        <input
+                                                            type="number"
+                                                            step="any"
+                                                            value={ins.umbral_critico}
+                                                            onChange={e => handleCambioUmbralInsumo(ins.id, 'umbral_critico', e.target.value)}
+                                                            style={{
+                                                                width: '100%',
+                                                                padding: '8px',
+                                                                backgroundColor: '#111827',
+                                                                border: '1px solid #374151',
+                                                                borderRadius: '6px',
+                                                                color: '#ffffff',
+                                                                fontSize: '13px',
+                                                                boxSizing: 'border-box'
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <div style={{ overflowX: 'auto', width: '100%', marginBottom: '25px' }}>
+                                    <table style={tableStyle}>
+                                        <thead>
+                                            <tr style={tableHeaderRowStyle}>
+                                                <th style={tableHeaderStyle}>Materia Prima (Insumo)</th>
+                                                <th style={tableHeaderStyle}>Stock Actual</th>
+                                                <th style={tableHeaderStyle}>Estado</th>
+                                                <th style={tableHeaderStyle}>🟡 Nivel Poco ({config.unidad_peso})</th>
+                                                <th style={tableHeaderStyle}>🔴 Punto Crítico ({config.unidad_peso})</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {insumosReglas.map(ins => {
+                                                const semaforo = getEstadoSemaforoInsumo(ins);
+                                                return (
+                                                    <tr key={ins.id} style={tableRowStyle}>
+                                                        <td style={{ ...tableCellStyle, fontWeight: '600', color: '#ffffff' }}>{ins.nombre}</td>
+                                                        <td style={tableCellStyle}>{ins.cantidad_gramos} {config.unidad_peso}</td>
+                                                        <td style={tableCellStyle}>
+                                                            <span style={{
+                                                                backgroundColor: semaforo.bg,
+                                                                color: semaforo.color,
+                                                                padding: '4px 10px',
+                                                                borderRadius: '12px',
+                                                                fontSize: '12px',
+                                                                fontWeight: '700'
+                                                            }}>
+                                                                {semaforo.label}
+                                                            </span>
+                                                        </td>
+                                                        <td style={tableCellStyle}>
+                                                            <input
+                                                                type="number"
+                                                                step="any"
+                                                                value={ins.umbral_advertencia}
+                                                                onChange={e => handleCambioUmbralInsumo(ins.id, 'umbral_advertencia', e.target.value)}
+                                                                style={{
+                                                                    padding: '6px 10px',
+                                                                    backgroundColor: '#1f2937',
+                                                                    border: '1px solid #374151',
+                                                                    borderRadius: '6px',
+                                                                    color: '#ffffff',
+                                                                    width: '110px',
+                                                                    fontSize: '13px'
+                                                                }}
+                                                            />
+                                                        </td>
+                                                        <td style={tableCellStyle}>
+                                                            <input
+                                                                type="number"
+                                                                step="any"
+                                                                value={ins.umbral_critico}
+                                                                onChange={e => handleCambioUmbralInsumo(ins.id, 'umbral_critico', e.target.value)}
+                                                                style={{
+                                                                    padding: '6px 10px',
+                                                                    backgroundColor: '#1f2937',
+                                                                    border: '1px solid #374151',
+                                                                    borderRadius: '6px',
+                                                                    color: '#ffffff',
+                                                                    width: '110px',
+                                                                    fontSize: '13px'
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+
+                            {/* Tarjetas Informativas Adicionales */}
+                            <div style={cardStyle}>
                                 <h4 style={{ margin: '0 0 10px 0', color: '#ffffff' }}>Período Obligatorio de Curado</h4>
                                 <p style={descriptionStyle}>Los jabones fabricados pasan automáticamente a curado por un tiempo mínimo de <strong>{config.dias_curado_defecto} días</strong>. Durante este período, el stock está restringido para uso o venta, a menos que un administrador autorice su salida manual de curado en la sección correspondiente.</p>
                             </div>

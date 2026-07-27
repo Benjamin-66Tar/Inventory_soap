@@ -121,14 +121,17 @@ const TablaInsumos = ({ datos = [], onAbrirFormulario, onReabastecer, config }) 
                 <tbody>
                     {filteredInsumos.length > 0 ? (
                         filteredInsumos.map(i => {
-                            const esCritico = i.cantidad_gramos <= (config ? config.umbral_critico_stock : 5);
+                            const advVal = i.umbral_advertencia !== undefined ? i.umbral_advertencia : 100;
+                            const critVal = i.umbral_critico !== undefined ? i.umbral_critico : (config ? config.umbral_critico_stock : 5);
+                            const esCritico = i.cantidad_gramos <= critVal;
+                            const esAdvertencia = !esCritico && i.cantidad_gramos <= advVal;
                             return (
                                 <tr key={i.id} style={{ borderBottom: '1px solid #f3f4f6', transition: 'background-color 0.2s' }}>
                                     <td style={{ padding: '16px 12px', fontWeight: '500', color: '#1f2937' }}>{i.nombre}</td>
                                     <td style={{ padding: '16px 12px' }}>
                                         <span style={{ 
                                             fontWeight: '600', 
-                                            color: esCritico ? '#dc2626' : '#1f2937' 
+                                            color: esCritico ? '#dc2626' : esAdvertencia ? '#d97706' : '#1f2937' 
                                         }}>
                                             {i.cantidad_gramos} {unitSuffix}
                                         </span>
@@ -142,7 +145,20 @@ const TablaInsumos = ({ datos = [], onAbrirFormulario, onReabastecer, config }) 
                                                 fontSize: '11px', 
                                                 fontWeight: '600' 
                                             }}>
-                                                ⚠️ Stock Crítico
+                                                🔴 Punto Crítico
+                                            </span>
+                                        )}
+                                        {esAdvertencia && (
+                                            <span style={{ 
+                                                marginLeft: '8px', 
+                                                padding: '4px 10px', 
+                                                backgroundColor: '#fef3c7', 
+                                                color: '#b45309', 
+                                                borderRadius: '12px', 
+                                                fontSize: '11px', 
+                                                fontWeight: '600' 
+                                            }}>
+                                                🟡 Poco
                                             </span>
                                         )}
                                     </td>
