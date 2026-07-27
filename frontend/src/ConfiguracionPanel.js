@@ -24,7 +24,6 @@ const ConfiguracionPanel = () => {
 
     // Estado de Reglas de Inventario e Insumos
     const [insumosReglas, setInsumosReglas] = useState([]);
-    const [recetasList, setRecetasList] = useState([]);
     const [guardandoUmbrales, setGuardandoUmbrales] = useState(false);
 
     // Archivo de Respaldo
@@ -54,7 +53,7 @@ const ConfiguracionPanel = () => {
         } else if (activeTab === 'admin_bitacora') {
             cargarBitacora();
         } else if (activeTab === 'admin_reglas') {
-            cargarInsumosYRecetas();
+            cargarInsumosReglas();
         }
         setMessage('');
         setError('');
@@ -85,14 +84,10 @@ const ConfiguracionPanel = () => {
             .catch(err => console.error("Error al cargar bitácora:", err));
     };
 
-    const cargarInsumosYRecetas = async () => {
+    const cargarInsumosReglas = async () => {
         try {
-            const [resIns, resRec] = await Promise.all([
-                api.get('/insumos/'),
-                api.get('/recetas/')
-            ]);
+            const resIns = await api.get('/insumos/');
             const insData = Array.isArray(resIns.data) ? resIns.data : (resIns.data.results || []);
-            const recData = Array.isArray(resRec.data) ? resRec.data : (resRec.data.results || []);
             
             const insumosMap = insData.map(ins => ({
                 ...ins,
@@ -100,50 +95,9 @@ const ConfiguracionPanel = () => {
                 umbral_critico: ins.umbral_critico !== undefined ? ins.umbral_critico : 50
             }));
             setInsumosReglas(insumosMap);
-            setRecetasList(recData);
         } catch (err) {
-            console.error("Error al cargar insumos y recetas para reglas:", err);
+            console.error("Error al cargar insumos para reglas:", err);
         }
-    };
-
-    const handleAutoCalcularUmbrales = () => {
-        if (recetasList.length === 0) {
-            alert("No hay recetas de producción configuradas para realizar el cálculo automático.");
-            return;
-        }
-
-        const consumoMaxPorInsumo = {};
-        recetasList.forEach(rec => {
-            if (rec.ingredientes && Array.isArray(rec.ingredientes)) {
-                rec.ingredientes.forEach(ing => {
-                    const insId = ing.insumo;
-                    const cant = parseFloat(ing.cantidad_base) || 0;
-                    if (!consumoMaxPorInsumo[insId] || cant > consumoMaxPorInsumo[insId]) {
-                        consumoMaxPorInsumo[insId] = cant;
-                    }
-                });
-            }
-        });
-
-        const nuevosInsumos = insumosReglas.map(ins => {
-            const maxCantBase = consumoMaxPorInsumo[ins.id];
-            if (maxCantBase && maxCantBase > 0) {
-                return {
-                    ...ins,
-                    umbral_critico: parseFloat(maxCantBase.toFixed(2)),
-                    umbral_advertencia: parseFloat((maxCantBase * 2).toFixed(2))
-                };
-            } else {
-                return {
-                    ...ins,
-                    umbral_critico: 50,
-                    umbral_advertencia: 100
-                };
-            }
-        });
-
-        setInsumosReglas(nuevosInsumos);
-        setMessage("✨ Umbrales auto-calculados según tus recetas oficiales. Revisa los valores y pulsa 'Guardar Todos los Umbrales'.");
     };
 
     const handleCambioUmbralInsumo = (id, campo, valor) => {
@@ -773,38 +727,18 @@ const ConfiguracionPanel = () => {
                                 Configura los límites de <strong>Poco (Advertencia 🟡)</strong> y <strong>Punto Crítico (Urgencia 🔴)</strong> de cada insumo según su escala de uso en tus recetas.
                             </p>
 
-                            {/* Barra de Acciones y Auto-Cálculo */}
+                            {/* Barra de Guardado de Umbrales */}
                             <div style={{
                                 display: 'flex',
-                                justifyContent: 'space-between',
+                                justifyContent: 'flex-end',
                                 alignItems: 'center',
                                 gap: '15px',
-                                flexWrap: 'wrap',
                                 backgroundColor: '#1f2937',
                                 padding: '16px',
                                 borderRadius: '10px',
                                 border: '1px solid #374151',
                                 marginBottom: '20px'
                             }}>
-                                <button
-                                    type="button"
-                                    onClick={handleAutoCalcularUmbrales}
-                                    style={{
-                                        backgroundColor: '#8b5cf6',
-                                        color: 'white',
-                                        border: 'none',
-                                        padding: '10px 18px',
-                                        borderRadius: '8px',
-                                        cursor: 'pointer',
-                                        fontWeight: '600',
-                                        fontSize: '13px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '6px'
-                                    }}
-                                >
-                                    🪄 Auto-calcular umbrales con mis Recetas
-                                </button>
                                 <button
                                     type="button"
                                     onClick={handleGuardarTodosUmbrales}
