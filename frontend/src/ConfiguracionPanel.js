@@ -908,10 +908,6 @@ const ConfiguracionPanel = () => {
                             )}
 
                             {/* Tarjetas Informativas Adicionales */}
-                            <div style={cardStyle}>
-                                <h4 style={{ margin: '0 0 10px 0', color: '#ffffff' }}>Período Obligatorio de Curado</h4>
-                                <p style={descriptionStyle}>Los jabones fabricados pasan automáticamente a curado por un tiempo mínimo de <strong>{config.dias_curado_defecto} días</strong>. Durante este período, el stock está restringido para uso o venta, a menos que un administrador autorice su salida manual de curado en la sección correspondiente.</p>
-                            </div>
 
                             <div style={{ ...cardStyle, marginTop: '20px' }}>
                                 <h4 style={{ margin: '0 0 10px 0', color: '#ffffff' }}>Catálogo de Razones para Salidas de Inventario</h4>
